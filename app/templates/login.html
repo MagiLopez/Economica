@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINLY - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #041933;
+            --primary-medium: #143966;
+            --primary-light: #3D6799;
+            --primary-lighter: #7A9FCC;
+            --white: #FFFFFF;
+            --light-gray: #F8F8F8;
+            --black: #000000;
+            --shadow: 0 10px 30px rgba(4, 25, 51, 0.1);
+            --shadow-hover: 0 15px 40px rgba(4, 25, 51, 0.2);
+            --border-radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 50%, var(--primary-light) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: var(--white);
+            padding: 50px 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 4px 8px rgba(4, 25, 51, 0.1));
+        }
+
+        .welcome-text {
+            color: var(--primary-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--primary-medium);
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--primary-light);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+            background-color: var(--white);
+            color: var(--primary-medium);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-lighter);
+            box-shadow: 0 0 0 4px rgba(122, 159, 204, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+            background-color: #fdf2f2;
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-lighter), var(--primary-light));
+            color: var(--white);
+            padding: 16px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-medium));
+        }
+
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-login.loading {
+            color: transparent;
+            position: relative;
+        }
+
+        .btn-login.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .error-message {
+            background: #e74c3c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 20%, 40%, 60%, 80% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        }
+
+        .demo-credentials {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--light-gray);
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .demo-credentials h4 {
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .demo-credentials p {
+            color: var(--primary-medium);
+            margin: 5px 0;
+        }
+
+        .demo-credentials strong {
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 40px 25px;
+                margin: 10px;
+            }
+
+            .logo {
+                width: 160px;
+            }
+
+            .welcome-text {
+                font-size: 1.6rem;
+            }
+
+            .form-group input {
+                padding: 12px 16px;
+            }
+
+            .btn-login {
+                padding: 14px 18px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo FINLY -->
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo">
+
+        <div class="welcome-text">Bienvenido</div>
+        <div class="subtitle">Decide con inteligencia, calcula con precisión.</div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">Iniciar Sesión</button>
+        </form>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="demo-credentials">
+            <h4>🔓 Credenciales de Prueba:</h4>
+            <p><strong>Usuario:</strong> admin | <strong>Contraseña:</strong> admin123</p>
+            <p><strong>Usuario:</strong> user | <strong>Contraseña:</strong> user123</p>
+            <p><strong>Usuario:</strong> finly | <strong>Contraseña:</strong> finly2024</p>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Limpiar errores anteriores
+            errorMessage.style.display = 'none';
+            usernameInput.classList.remove('error');
+            passwordInput.classList.remove('error');
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                showError('Por favor completa todos los campos');
+                if (!username) usernameInput.classList.add('error');
+                if (!password) passwordInput.classList.add('error');
+                return;
+            }
+
+            // Mostrar loading
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Login exitoso - redireccionar
+                    window.location.href = '/';
+                } else {
+                    showError(result.error);
+                    usernameInput.classList.add('error');
+                    passwordInput.classList.add('error');
+                }
+
+            } catch (error) {
+                showError('Error de conexión. Intenta de nuevo.');
+            } finally {
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        // Limpiar errores al escribir
+        usernameInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            if (errorMessage.style.display === 'block') {
+                errorMessage.style.display = 'none';
+            }
+        });
+
+        passwordInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            if (errorMessage.style.display === 'block') {
+                errorMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

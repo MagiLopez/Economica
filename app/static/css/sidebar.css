@@ -1,0 +1,120 @@
+/* === SIDEBAR GENERAL === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0; /* En escritorio aparece fijo */
+  width: 240px;
+  height: 100%;
+  background: #041933;
+  color: #fff;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transition: left 0.3s ease;
+}
+
+/* Contenido con sidebar fijo en desktop */
+.with-sidebar {
+  margin-left: 240px; /* Deja espacio para el sidebar */
+  transition: margin-left 0.3s ease;
+}
+
+/* Cuando está oculto en mobile */
+.sidebar.closed {
+  left: -260px;
+}
+
+/* === HEADER DEL SIDEBAR === */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.logo-sidebar {
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: none; /* Oculto en desktop */
+}
+
+/* === MENÚ === */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.sidebar-menu li {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-menu li a {
+  display: block;
+  padding: 12px 20px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.sidebar-menu li a:hover {
+  background: #3D6799;
+}
+
+/* === BOTÓN HAMBURGUESA === */
+.hamburger {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #041933;
+  color: #fff;
+  border: none;
+  font-size: 22px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 1100;
+  display: none; /* oculto en desktop */
+}
+
+/* === MEDIA QUERY PARA RESPONSIVE === */
+@media (max-width: 768px) {
+  .sidebar {
+    left: -260px; /* Oculto en móviles */
+  }
+
+  .sidebar.active {
+    left: 0; /* Se abre al hacer clic en hamburguesa */
+  }
+
+  .hamburger {
+    display: block; /* Mostrar hamburguesa solo en móvil */
+  }
+
+  .close-btn {
+    display: block; /* Mostrar X en móvil */
+  }
+
+  .with-sidebar {
+    margin-left: 0; /* No desplazar contenido en móviles */
+  }
+}
+
+

@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+    <div class="container">
+      <div class="header">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-main">
+        <a href="/logout" class="logout-icon" title="Cerrar Sesión">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+        <div class="welcome-section">
+          <h1>¡Bienvenido, {{ username }}!</h1>
+          <p>Decide con inteligencia, calcula con precisión.</p>
+        </div>
+      </div>
+
+      <div class="subtitle-main">Selecciona el tipo de interés que deseas calcular:</div>
+
+      <div class="menu">
+        <a href="/simple" class="btn">
+          📈 Interés Simple
+          <small style="display:block;margin-top:10px;font-size:0.9rem;opacity:0.7;">
+            Para cálculos de interés básico
+          </small>
+        </a>
+
+        <a href="/compuesto" class="btn">
+          📊 Interés Compuesto
+          <small style="display:block;margin-top:10px;font-size:0.9rem;opacity:0.7;">
+            Para inversiones y crecimiento exponencial
+          </small>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+  </script>
+{% endblock %}

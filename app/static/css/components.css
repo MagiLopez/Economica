@@ -1,0 +1,101 @@
+/* === BOTONES === */
+.menu {
+  display: flex;
+  justify-content: center;  /* centra los botones dentro del container */
+  gap: 20px;                /* espacio entre botones */
+  flex-wrap: wrap;          /* se bajan en móviles */
+}
+
+.btn {
+  background: linear-gradient(135deg, var(--primary-lighter), var(--primary-light));
+  color: var(--white);
+  padding: 15px 20px;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+  border: none;
+  min-width: 220px;   /* ancho mínimo fijo */
+  max-width: 300px;   /* opcional: límite máximo */
+  text-align: center;
+  flex: 1;            /* permite que crezcan iguales */
+ text-decoration: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-medium));
+}
+
+/* === FORMULARIOS === */
+/* FORMULARIO */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* espacio entre filas */
+}
+
+/* Cada fila de inputs */
+.input-row {
+  display: flex;
+  gap: 20px;
+}
+
+/* Cada input con su label */
+.input-group {
+  flex: 1; /* todos ocupan el mismo espacio dentro de la fila */
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--primary-dark);
+}
+
+.input-group input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius-small);
+  font-size: 1rem;
+  width: 100%;
+}
+
+.input-group small {
+  font-size: 0.8rem;
+  margin-top: 4px;
+  color: #666;
+}
+
+/* Inputs de tiempo (días, meses, años) en fila */
+.time-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.time-inputs input {
+  flex: 1;
+}
+
+/* Responsive: en móvil los inputs vuelven a columna */
+@media (max-width: 768px) {
+  .input-row {
+    flex-direction: column;
+  }
+}
+
+/* === RESULTADOS === */
+.result-box {
+  margin-top: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, var(--primary-lighter), var(--primary-light));
+  color: var(--white);
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+.result-box h2 { margin-bottom: 10px; }
+.result-box p { font-size: 1.2rem; font-weight: 600; }
+

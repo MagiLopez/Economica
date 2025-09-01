@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Interés Compuesto{% endblock %}
+
+{% block content %}
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-sidebar">
+            <span class="sidebar-title">FINLY</span>
+            <button class="close-btn" onclick="toggleSidebar()"><i class="fa fa-times"></i></button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/"><i class="fa fa-home"></i> Inicio</a></li>
+            <li><a href="/simple"><i class="fa fa-chart-line"></i> Interés Simple</a></li>
+            <li><a href="/compuesto"><i class="fa fa-chart-pie"></i> Interés Compuesto</a></li>
+            <li><a href="/logout"><i class="fa fa-arrow-right-from-bracket"></i> Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- Botón hamburguesa -->
+    <button class="hamburger" onclick="toggleSidebar()">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header-small">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+            <h1>📊 Interés Compuesto</h1>
+            <span class="user-info">{{ username }}</span>
+        </div>
+
+        <p class="instruction">
+            Completa <strong>3 campos</strong> y deja <strong>1 vacío</strong>. 
+            FINLY calculará automáticamente el faltante.
+        </p>
+
+        <form class="form" id="compoundForm">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Capital Inicial (P):</label>
+                    <input type="number" step="0.01" placeholder="Ej. 1000">
+                    <small>Dinero inicial a invertir</small>
+                </div>
+
+                <div class="input-group">
+                    <label>Tasa de Interés (%):</label>
+                    <input type="number" step="0.01" placeholder="Ej. 5">
+                    <small>Porcentaje por periodo</small>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Período de la inversión:</label>
+                    <div class="time-input">
+                        <input type="number" min="1" placeholder="Número de meses">
+                        <input type="number" min="1" placeholder="Número de pagos">
+                    </div>
+                    <small>Indica la duración en meses y cuántos pagos se hacen en total</small>
+                </div>
+
+
+                <div class="input-group">
+                    <label>Monto Final (M):</label>
+                    <input type="number" step="0.01" placeholder="Ej. 1100">
+                    <small>Dinero total al final</small>
+                </div>
+            </div>
+
+            <button type="button" class="btn">🧮 Calcular</button>
+        </form>
+
+        <a href="/" class="btn-back">⬅ Volver al Menú</a>
+    </div>
+    
+{% endblock %}

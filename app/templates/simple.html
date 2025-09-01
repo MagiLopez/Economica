@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Interés Simple{% endblock %}
+
+{% block content %}
+
+    <!-- Sidebar -->
+    
+
+    <!-- Contenido principal -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header-small">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+            <h1>📈 Interés Simple</h1>
+            <span class="user-info">{{ username }}</span>
+        </div>
+
+        <p class="instruction">Completa <strong>3 campos</strong> y deja <strong>1 vacío</strong>. FINLY calculará automáticamente el campo faltante.</p>
+
+        <form class="form" id="simpleForm">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Capital Inicial (P):</label>
+                    <input type="number" id="capital" step="0.01" placeholder="Ej. 1000">
+                    <small>Dinero inicial a invertir</small>
+                </div>
+
+                <div class="input-group">
+                    <label>Tasa de Interés (% anual):</label>
+                    <input type="number" id="tasa" step="0.01" placeholder="Ej. 5">
+                    <small>Porcentaje de ganancia anual</small>
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Tiempo:</label>
+                    <div class="time-inputs">
+                        <input type="number" id="tiempo_dias" step="1" placeholder="Días">
+                        <input type="number" id="tiempo_meses" step="1" placeholder="Meses">
+                        <input type="number" id="tiempo_anios" step="1" placeholder="Años">
+                    </div>
+                    <small>Duración de la inversión</small>
+                </div>
+
+                <div class="input-group">
+                    <label>Monto Final (M):</label>
+                    <input type="number" id="monto" step="0.01" placeholder="Ej. 1100">
+                    <small>Dinero total al final</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn" id="calcularBtn">🧮 Calcular Automáticamente</button>
+        </form>
+
+        <div class="result-box hidden" id="resultBox">
+            <div class="result-content">
+                <h3>💰 Resultado:</h3>
+                <div class="result-value" id="resultValue">0</div>
+                <div class="result-detail" id="resultDetail"></div>
+                <div class="result-detail" id="interestDetail"></div>
+            </div>
+        </div>
+
+        <a href="/" class="btn-back">⬅ Volver al Menú</a>
+    </div>
+
+    <!-- Script de sidebar -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("active");
+        }
+
+        // Script de validación del formulario
+        const form = document.getElementById('simpleForm');
+        const capitalInput = document.getElementById('capital');
+        const tasaInput = document.getElementById('tasa');
+        const tiempoDiasInput = document.getElementById('tiempo_dias');
+        const tiempoMesesInput = document.getElementById('tiempo_meses');
+        const tiempoAniosInput = document.getElementById('tiempo_anios');
+        const montoInput = document.getElementById('monto');
+        const resultBox = document.getElementById('resultBox');
+        const resultValue = document.getElementById('resultValue');
+        const resultDetail = document.getElementById('resultDetail');
+        const interestDetail = document.getElementById('interestDetail');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const tiempoLleno = tiempoDiasInput.value || tiempoMesesInput.value || tiempoAniosInput.value;
+
+            let filled = 0;
+            if (capitalInput.value) filled++;
+            if (tasaInput.value) filled++;
+            if (tiempoLleno) filled++;
+            if (montoInput.value) filled++;
+
+            if (filled !== 3) {
+                resultBox.classList.remove('hidden');
+                resultValue.innerText = "⚠ Validación incorrecta";
+                resultDetail.innerText = "Debes completar exactamente 3 campos y dejar 1 vacío.";
+                interestDetail.innerText = "";
+                return;
+            }
+
+            resultBox.classList.remove('hidden');
+            resultValue.innerText = "✔ Validación correcta";
+            resultDetail.innerText = "Cálculo listo para ejecutarse.";
+            interestDetail.innerText = "Aquí aparecerán los resultados reales.";
+        });
+    </script>
+{% endblock %}
