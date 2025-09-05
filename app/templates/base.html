@@ -39,8 +39,10 @@
     </div>
     <ul class="sidebar-menu">
       <li><a href="/"><i class="fa fa-home"></i> Inicio</a></li>
-      <li><a href="/simple"><i class="fa fa-chart-line"></i> Interés Simple</a></li>
+      <li><a href="/interes"><i class="fa-solid fa-dollar-sign"></i> Tasa de Interés</a></li>
+      <li><a href="/simple"><i class="fa fa-chart-line"></i> Interés simple</a></li>
       <li><a href="/compuesto"><i class="fa fa-chart-pie"></i> Interés Compuesto</a></li>
+      <li><a href="/anualidades"><i class=" fa-solid fa-calendar-alt"></i> Anualidades</a></li>
       <li><a href="/logout"><i class="fa fa-arrow-right-from-bracket"></i> Cerrar Sesión</a></li>
     </ul>
   </nav>
@@ -54,5 +56,11 @@
         {% block content %}
         {% endblock %}
     </div>
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+    </script>
+
 </body>
 </html>

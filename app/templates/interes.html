@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Tasa de Interés{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-small">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+        <h1>💲 Tasa de Interés</h1>
+        <span class="user-info">{{ username }}</span>
+    </div>
+    
+    <p>Completa exactamente <strong>2 campos</strong> y deja <strong>1 vacío</strong>. El cálculo se realizará en el servidor.</p>
+
+    <form id="interesForm">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="capital">Capital (C):</label>
+                <input type="number" id="capital" name="capital">
+            </div>
+
+        
+
+        </div>
+        <div class="input-row">
+            <div class="input-group">
+                <label for="tiempo">Tiempo (años):</label>
+                <input type="number" id="tiempo" name="tiempo">
+            </div>
+
+            <div class="input-group">
+                <label for="tasa">Tasa de Interés (i):</label>
+                <input type="number" id="tasa" step="0.01">
+                <small> </small>
+            </div>
+        </div>
+        
+
+        <button type="submit" class="btn" id="calcularBtn"> Calcular</button>
+    </form>
+
+   <div class="result-box hidden" id="resultBox">
+        <div class="result-content">
+            <h3>💰 Resultado:</h3>
+            <div class="result-value" id="resultValue">0</div>
+            <div class="result-detail" id="resultDetail"></div>
+            <div class="result-detail" id="interestDetail"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('interesForm');
+    const capitalInput = document.getElementById('capital');
+    const tiempoInput = document.getElementById('tiempo');
+    const tasaInput = document.getElementById('tasa');
+    const resultBox = document.getElementById('resultBox');
+    const resultValue = document.getElementById('resultValue');
+    const resultDetail = document.getElementById('resultDetail');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        let filled = 0;
+        if (capitalInput.value) filled++;
+        if (tiempoInput.value) filled++;
+        if (tasaInput.value) filled++;
+
+        if (filled !== 2) {
+            resultBox.classList.remove('hidden');
+            resultValue.innerText = "⚠ Validación incorrecta";
+            resultDetail.innerText = "Debes completar exactamente 22 campos y dejar 1 vacío.";
+            return;
+        }
+
+        resultBox.classList.remove('hidden');
+        resultValue.innerText = "✔ Validación correcta";
+        resultDetail.innerText = "Cálculo listo para ejecutarse en el servidor.";
+    });
+</script>
+{% endblock %}

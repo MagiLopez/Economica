@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Anualidades{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-small">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+        <h1>📅 Anualidades</h1>
+        <span class="user-info">{{ username }}</span>
+    </div>
+    
+    <p>Completa exactamente <strong>4 campos</strong> y deja <strong>1 vacío</strong>. El cálculo se realizará en el servidor.</p>
+
+    <form id="anualidadesForm">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="renta">Renta (R):</label>
+                <input type="number" id="renta" name="renta">
+            </div>
+
+            <div class="input-group">
+                <label for="n">Número de períodos (n):</label>
+                <input type="number" id="n" name="n">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="tasa">Tasa de interés (i):</label>
+                <input type="number" id="tasa" name="tasa" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label for="vp">Valor Presente (VP):</label>
+                <input type="number" id="vp" name="vp">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="vf">Valor Futuro (VF):</label>
+                <input type="number" id="vf" name="vf">
+                 <small> </small>
+            </div>
+        </div>
+
+        <button type="submit" class="btn" id="calcularBtn"> Calcular</button>
+    </form>
+
+   <div class="result-box hidden" id="resultBox">
+        <div class="result-content">
+            <h3>💰 Resultado:</h3>
+            <div class="result-value" id="resultValue">0</div>
+            <div class="result-detail" id="resultDetail"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('anualidadesForm');
+    const rentaInput = document.getElementById('renta');
+    const nInput = document.getElementById('n');
+    const tasaInput = document.getElementById('tasa');
+    const vpInput = document.getElementById('vp');
+    const vfInput = document.getElementById('vf');
+    const resultBox = document.getElementById('resultBox');
+    const resultValue = document.getElementById('resultValue');
+    const resultDetail = document.getElementById('resultDetail');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        let filled = 0;
+        if (rentaInput.value) filled++;
+        if (nInput.value) filled++;
+        if (tasaInput.value) filled++;
+        if (vpInput.value) filled++;
+        if (vfInput.value) filled++;
+
+        if (filled !== 4) {
+            resultBox.classList.remove('hidden');
+            resultValue.innerText = "⚠ Validación incorrecta";
+            resultDetail.innerText = "Debes completar exactamente 4 campos y dejar 1 vacío.";
+            return;
+        }
+
+        resultBox.classList.remove('hidden');
+        resultValue.innerText = "✔ Validación correcta";
+        resultDetail.innerText = "Cálculo listo para ejecutarse en el servidor.";
+    });
+</script>
+{% endblock %}
