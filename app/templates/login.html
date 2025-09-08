@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FINLY - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINLY - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
         :root {
             --primary-dark: #041933;
             --primary-medium: #143966;
@@ -231,41 +232,134 @@
                 font-size: 1rem;
             }
         }
-    </style>
+
+    .btn-google {
+      width: 100%;
+      background: #fff;
+      color: #444;
+      border: 2px solid #ccc;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-google:hover {
+      background: #f8f8f8;
+      border-color: #999;
+    }
+
+    .btn-google img {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="login-container">
-        <!-- Logo FINLY -->
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo">
+  <div class="login-container">
+    <!-- Logo FINLY -->
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo">
 
-        <div class="welcome-text">Bienvenido</div>
-        <div class="subtitle">Decide con inteligencia, calcula con precisión.</div>
+    <div class="welcome-text">Bienvenido</div>
+    <div class="subtitle">Decide con inteligencia, calcula con precisión.</div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" name="username" required autocomplete="username">
-            </div>
+    <!-- Formulario clásico -->
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Usuario</label>
+        <input type="text" id="username" name="username" required autocomplete="username">
+      </div>
 
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
-            </div>
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
 
-            <button type="submit" class="btn-login" id="loginBtn">Iniciar Sesión</button>
-        </form>
+      <button type="submit" class="btn-login" id="loginBtn">Iniciar Sesión</button>
+    </form>
 
-        <div class="error-message" id="errorMessage"></div>
+    <!-- Botón de login con Google -->
+    <button class="btn-google" onclick="loginGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
+      Iniciar sesión con Google
+    </button>
 
-        <div class="demo-credentials">
-            <h4>🔓 Credenciales de Prueba:</h4>
-            <p><strong>Usuario:</strong> admin | <strong>Contraseña:</strong> admin123</p>
-            <p><strong>Usuario:</strong> user | <strong>Contraseña:</strong> user123</p>
-            <p><strong>Usuario:</strong> finly | <strong>Contraseña:</strong> finly2024</p>
-        </div>
+    <div class="error-message" id="errorMessage"></div>
+
+    <div class="demo-credentials">
+      <h4>🔓 Credenciales de Prueba:</h4>
+      <p><strong>Usuario:</strong> admin | <strong>Contraseña:</strong> admin123</p>
+      <p><strong>Usuario:</strong> user | <strong>Contraseña:</strong> user123</p>
+      <p><strong>Usuario:</strong> finly | <strong>Contraseña:</strong> finly2024</p>
     </div>
+  </div>
 
-    <script>
+  <!-- ================= FIREBASE SDK ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+    // Configuración de tu proyecto Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAoz8Ybmc-_GpLrYr_JVM5_886iAR6YM6w",
+      authDomain: "economica-99fed.firebaseapp.com",
+      projectId: "economica-99fed",
+      storageBucket: "economica-99fed.firebasestorage.app",
+      messagingSenderId: "1030723751213",
+      appId: "1:1030723751213:web:efbbee7cc98ea34b93d7a4",
+      measurementId: "G-75LB682YQB"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Función login con Google
+    window.loginGoogle = async function () {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const idToken = await user.getIdToken();
+
+        console.log("Usuario autenticado:", user);
+        console.log("ID Token:", idToken);
+
+        // Enviar el token a tu backend FastAPI
+        const response = await fetch("http://127.0.0.1:5000/login/verificacionGoogle", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: idToken })
+        });
+
+        const data = await response.json();
+        console.log("Respuesta del backend:", data);
+
+        if (response.ok) {
+          alert("✅ Bienvenido " + (data.name || data.email));
+          window.location.href = "/inicio"; // redirigir al dashboard
+        } else {
+          alert("❌ Error: " + data.detail);
+        }
+      } catch (error) {
+        console.error("Error en login con Google:", error);
+        alert("Error: " + error.message);
+      }
+    };
+  </script>
+
+  <!-- ================= JS CLÁSICO DE TU FORMULARIO ================= -->
+   <script>
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const errorMessage = document.getElementById('errorMessage');
@@ -342,5 +436,75 @@
             }
         });
     </script>
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      errorMessage.style.display = 'none';
+      usernameInput.classList.remove('error');
+      passwordInput.classList.remove('error');
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!username || !password) {
+        showError('Por favor completa todos los campos');
+        if (!username) usernameInput.classList.add('error');
+        if (!password) passwordInput.classList.add('error');
+        return;
+      }
+
+      loginBtn.classList.add('loading');
+      loginBtn.disabled = true;
+
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          window.location.href = '/';
+        } else {
+          showError(result.error);
+          usernameInput.classList.add('error');
+          passwordInput.classList.add('error');
+        }
+      } catch (error) {
+        showError('Error de conexión. Intenta de nuevo.');
+      } finally {
+        loginBtn.classList.remove('loading');
+        loginBtn.disabled = false;
+      }
+    });
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+
+    usernameInput.addEventListener('input', function() {
+      this.classList.remove('error');
+      if (errorMessage.style.display === 'block') {
+        errorMessage.style.display = 'none';
+      }
+    });
+
+    passwordInput.addEventListener('input', function() {
+      this.classList.remove('error');
+      if (errorMessage.style.display === 'block') {
+        errorMessage.style.display = 'none';
+      }
+    });
+  </script>
 </body>
 </html>
