@@ -3,9 +3,7 @@ from app import app
 
 # Usuarios de prueba
 USERS = {
-    'admin': 'admin123',
-    'user': 'user123',
-    'finly': 'finly2024'
+    "123": '123'
 }
 
 @app.route('/')
@@ -61,3 +59,23 @@ def anualidades():
     if 'username' not in session:
         return redirect(url_for('login'))
     return render_template('anualidades.html', username=session['username'])
+
+@app.route('/registro', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        data = request.json
+        username = data.get('cedula')
+        password = data.get('password')
+
+        # Validación simple
+        if not username or not password:
+           return jsonify({'success': False, 'error': 'Todos los campos son obligatorios'})
+
+        if username in USERS:
+            return jsonify({'success': False, 'error': 'El usuario ya existe'})
+
+        # Registrar usuario en el diccionario temporal
+        USERS[username] = password
+        return jsonify({'success': True, 'message': 'Usuario registrado con éxito'})
+
+    return render_template('registro.html')

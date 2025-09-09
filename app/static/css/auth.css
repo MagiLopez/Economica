@@ -1,0 +1,141 @@
+/* Fondo para login y registro */
+body { 
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium), var(--primary-light)); 
+    min-height: 100vh; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    overflow: auto;
+}
+
+/* Contenedor base */
+.login-container, .register-container { 
+    max-width: 480px; 
+    width: 100%; 
+    margin: 0 auto; 
+    animation: slideUp 0.6s ease-out; 
+    background: var(--white);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+.register-container {
+    max-width: 600px;          /* más ancho */
+    width: 100%;
+    padding: 15px 30px;        /* más espacio interno */
+    border-radius: 8px;        /* esquinas rectangulares */
+}
+
+
+/* Centramos SOLO el título y el logo */
+.login-container h1, 
+.register-container h1,
+.logo-login, 
+.logo-register, 
+.subtitle-login, 
+.subtitle-register {
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Formularios alineados a la izquierda */
+.login-form, 
+.register-form {
+    text-align: left;
+}
+
+
+/* Animación */
+@keyframes slideUp { 
+    from { opacity: 0; transform: translateY(30px); } 
+}
+
+/* Logo */
+.logo-login, .logo-register { 
+    width: 150px; 
+    margin-bottom: 20px; 
+    filter: drop-shadow(0 4px 8px rgba(4, 25, 51, 0.1)); 
+}
+
+/* Títulos */
+.welcome-text, .register-text { 
+    font-size: 1.7rem; 
+    font-weight: 700; 
+    margin-bottom: 10px; 
+    color: var(--primary-dark); 
+}
+
+.subtitle-login, .subtitle-register { 
+    margin-bottom: 20px; 
+    opacity: 0.6; 
+    font-size: 0.9rem;
+}
+
+/* Botones */
+.btn-login, .btn-register { 
+    margin-top: 10px; 
+    font-size: 1rem; 
+    display: block;
+    margin: 5px auto 0 auto; /* arriba 20px, auto lados, 0 abajo */
+    width: 60%;              /* ancho fijo, puedes ajustar */
+    text-align: center;
+}
+
+/* Links extras */
+.extra-links {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+.extra-links a {
+    color: var(--primary-dark);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.extra-links a:hover {
+    color: var(--primary-medium);
+}
+
+/* Mensajes de error */
+.error-message { 
+    background: #e74c3c; 
+    color: white; 
+    padding: 12px 20px; 
+    border-radius: var(--border-radius-small); 
+    margin-top: 15px; 
+    font-size: 0.9rem; 
+    display: none; 
+}
+
+.btn-google {
+      width: 100%;
+      background: #fff;
+      color: #444;
+      border: 2px solid #ccc;
+      padding: 12px 10px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-google:hover {
+      background: #f8f8f8;
+      border-color: #999;
+    }
+
+    .btn-google img {
+      width: 15px;
+      height: 15px;
+    }
