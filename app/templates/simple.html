@@ -60,8 +60,6 @@
 
     <a href="/" class="btn-back">⬅ Volver al Menú</a>
 </div>
-
-
 <script>
     const form = document.getElementById('simpleForm');
     const capitalInput = document.getElementById('capital');
@@ -76,7 +74,7 @@
     const interestDetail = document.getElementById('interestDetail');
 
     // ⚡️ Pega aquí tu URL pública de ngrok
-    const API_URL = "https://4fa850d3312d.ngrok-free.app/calcular_Interes_Simple";
+    const API_URL = " https://4fa850d3312d.ngrok-free.app/calcular_Interes_Simple";
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -122,11 +120,11 @@
             if (response.ok) {
                 // Si esperas Vf
                 if (data.Vf !== undefined) {
-                    resultDetail.innerText = ` ${data.Vf}`;
+                    resultDetail.innerText = `${data.Vf}`;
                 }
                 // Si esperas Vi
                 else if (data.Vi !== undefined) {
-                    resultDetail.innerText = ` ${data.Vi}`;
+                    resultDetail.innerText = `${data.Vi}`;
                 }
                 // Si esperas tiempo
                 else if (data.t !== undefined) {
@@ -135,7 +133,7 @@
                 else {
                     resultDetail.innerText = "No se pudo calcular.";
                 }
-                
+
                 interestDetail.innerText = "Cálculo realizado correctamente.";
             } else {
                 resultValue.innerText = "⚠ Error en el cálculo";
