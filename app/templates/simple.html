@@ -53,7 +53,6 @@
     <div class="result-box hidden" id="resultBox">
         <div class="result-content">
             <h3>💰 Resultado:</h3>
-            <div class="result-value" id="resultValue">0</div>
             <div class="result-detail" id="resultDetail"></div>
             <div class="result-detail" id="interestDetail"></div>
         </div>
@@ -64,7 +63,6 @@
 
 
 <script>
-    // Script de validación del formulario
     const form = document.getElementById('simpleForm');
     const capitalInput = document.getElementById('capital');
     const tasaInput = document.getElementById('tasa');
@@ -77,7 +75,10 @@
     const resultDetail = document.getElementById('resultDetail');
     const interestDetail = document.getElementById('interestDetail');
 
-    form.addEventListener('submit', function (e) {
+    // ⚡️ Pega aquí tu URL pública de ngrok
+    const API_URL = "https://4fa850d3312d.ngrok-free.app/calcular_Interes_Simple";
+
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const tiempoLleno = tiempoDiasInput.value || tiempoMesesInput.value || tiempoAniosInput.value;
@@ -96,10 +97,58 @@
             return;
         }
 
-        resultBox.classList.remove('hidden');
-        resultValue.innerText = "✔ Validación correcta";
-        resultDetail.innerText = "Cálculo listo para ejecutarse.";
-        interestDetail.innerText = "Aquí aparecerán los resultados reales.";
+        // Crear objeto con los datos
+        const payload = {
+            Vi: capitalInput.value ? parseFloat(capitalInput.value) : null,
+            i: tasaInput.value ? parseFloat(tasaInput.value) : null,
+            t_d: tiempoDiasInput.value ? parseInt(tiempoDiasInput.value) : null,
+            t_m: tiempoMesesInput.value ? parseInt(tiempoMesesInput.value) : null,
+            t_a: tiempoAniosInput.value ? parseInt(tiempoAniosInput.value) : null,
+            Vf: montoInput.value ? parseFloat(montoInput.value) : null
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            resultBox.classList.remove('hidden');
+            if (response.ok) {
+                // Si esperas Vf
+                if (data.Vf !== undefined) {
+                    resultDetail.innerText = ` ${data.Vf}`;
+                }
+                // Si esperas Vi
+                else if (data.Vi !== undefined) {
+                    resultDetail.innerText = ` ${data.Vi}`;
+                }
+                // Si esperas tiempo
+                else if (data.t !== undefined) {
+                    resultDetail.innerText = `${data.t}`;
+                }
+                else {
+                    resultDetail.innerText = "No se pudo calcular.";
+                }
+                
+                interestDetail.innerText = "Cálculo realizado correctamente.";
+            } else {
+                resultValue.innerText = "⚠ Error en el cálculo";
+                resultDetail.innerText = data.detail || "Ocurrió un error inesperado.";
+                interestDetail.innerText = "";
+            }
+        } catch (error) {
+            resultBox.classList.remove('hidden');
+            resultValue.innerText = "⚠ Error de conexión";
+            resultDetail.innerText = "No se pudo conectar con la API.";
+            interestDetail.innerText = error.toString();
+        }
     });
 </script>
+
 {% endblock %}
