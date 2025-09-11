@@ -81,7 +81,7 @@
         console.log("ID Token:", idToken);
 
         // Enviar el token a tu backend FastAPI
-        const response = await fetch("https://4fa850d3312d.ngrok-free.app/login/verificacionGoogle", {
+        const response = await fetch("https://ef866be933f5.ngrok-free.app/login/verificacionGoogle", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: idToken })
