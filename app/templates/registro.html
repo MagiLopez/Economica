@@ -83,7 +83,7 @@
             btn.classList.add('loading');
 
             try {
-                const res = await fetch('/registro', {
+                const res = await fetch('https://ef866be933f5.ngrok-free.app/login/registro', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -95,11 +95,13 @@
                     })
                 });
                 const result = await res.json();
-                if (result.success) {
-                    window.location.href = '/';
+                if (res.ok) {
+                    alert(result.message); // o redirige si quieres
+                    window.location.href = '/login';
                 } else {
-                    showError(result.error || 'Error en el registro');
+                    showError(result.detail || 'Error en el registro');
                 }
+
             } catch {
                 showError('Error de conexión. Intenta de nuevo.');
             } finally {
