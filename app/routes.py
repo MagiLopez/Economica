@@ -27,6 +27,27 @@ def login():
     
     return render_template('login.html')
 
+# Nueva ruta para el login con Google (simplificado)
+@app.route('/google-login', methods=['POST'])
+def google_login():
+    try:
+        data = request.json
+        user_name = data.get('name')  # Nombre del usuario de Google
+        user_email = data.get('email')  # Email del usuario de Google
+        
+        # Usar el nombre o email como username para la sesión
+        username = user_name if user_name else user_email.split('@')[0]
+        
+        # Simplemente crear la sesión sin validación adicional
+        session['username'] = username
+        session['google_user'] = True  # Marcar como usuario de Google
+        
+        return jsonify({'success': True, 'message': 'Login con Google exitoso'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Error al procesar login con Google'})
+
+
 @app.route('/inicio')
 def inicio():
     return render_template('index.html',)

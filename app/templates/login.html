@@ -75,26 +75,35 @@
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const idToken = await user.getIdToken();
+        //const idToken = await user.getIdToken();
 
         console.log("Usuario autenticado:", user);
-        console.log("ID Token:", idToken);
+       // console.log("ID Token:", idToken);
 
         // Enviar el token a tu backend FastAPI
-        const response = await fetch("https://ef866be933f5.ngrok-free.app/login/verificacionGoogle", {
+        /*const response = await fetch("https://ef866be933f5.ngrok-free.app/login/verificacionGoogle", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: idToken })
+        });*/
+        
+        // Enviar solo los datos básicos a tu backend Flask
+        const response = await fetch("/google-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            name: user.displayName,
+            email: user.email 
+          })
         });
-
         const data = await response.json();
         console.log("Respuesta del backend:", data);
 
-        if (response.ok) {
-          alert("✅ Bienvenido " + (data.name || data.email));
-          window.location.href = "/inicio"; // redirigir al dashboard
+        if (response.ok && data.success) {
+          alert("✅ Bienvenido " + user.displayName);
+          window.location.href = "/"; // redirigir al dashboard
         } else {
-          alert("❌ Error: " + data.detail);
+          alert("❌ Error: " + (data.error || "Error desconocido"));
         }
       } catch (error) {
         console.error("Error en login con Google:", error);
