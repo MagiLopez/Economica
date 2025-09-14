@@ -50,15 +50,18 @@
 </div>
 
 <script>
-    const form = document.getElementById('interesForm');
+   const form = document.getElementById('interesForm');
     const capitalInput = document.getElementById('capital');
     const tiempoInput = document.getElementById('tiempo');
     const tasaInput = document.getElementById('tasa');
     const resultBox = document.getElementById('resultBox');
     const resultValue = document.getElementById('resultValue');
     const resultDetail = document.getElementById('resultDetail');
+    const interestDetail = document.getElementById('interestDetail');
+    const vfMensualDetail = document.getElementById('vfMensualDetail');
+    const vfDetail = document.getElementById('vfDetail');
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         let filled = 0;
@@ -68,14 +71,59 @@
 
         if (filled !== 2) {
             resultBox.classList.remove('hidden');
-            resultValue.innerText = "⚠ Validación incorrecta";
-            resultDetail.innerText = "Debes completar exactamente 22 campos y dejar 1 vacío.";
+            resultValue.innerText = "⚠ Error de validación";
+            resultDetail.innerText = "Debes completar exactamente 2 campos y dejar 1 vacío.";
+            interestDetail.innerText = "";
+            vfMensualDetail.innerText = "";
+            vfDetail.innerText = "";
             return;
         }
 
+        // Mostrar loading
         resultBox.classList.remove('hidden');
-        resultValue.innerText = "✔ Validación correcta";
-        resultDetail.innerText = "Cálculo listo para ejecutarse en el servidor.";
+        resultValue.innerText = "⏳ Calculando...";
+        resultDetail.innerText = "";
+        interestDetail.innerText = "";
+        vfMensualDetail.innerText = "";
+        vfDetail.innerText = "";
+
+        try {
+            // Preparar datos para enviar
+            const requestData = {
+                capital: capitalInput.value ? parseFloat(capitalInput.value) : null,
+                tiempo: tiempoInput.value ? parseFloat(tiempoInput.value) : null,
+                tasa: tasaInput.value ? parseFloat(tasaInput.value) : null
+            };
+
+            // Enviar solicitud al backend
+            const response = await fetch('http://127.0.0.1:5000/calcular_Tasa_de_Interes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Mostrar resultados
+            resultValue.innerText = "✅ Cálculo completado";
+            resultDetail.innerText = `Tasa de interés mensual: ${data.i_mensual.toFixed(4)}%`;
+            interestDetail.innerText = `Valor futuro mensual: $${data.Vf_mensual.toFixed(2)}`;
+            vfMensualDetail.innerText = `Valor futuro total: $${data.Vf.toFixed(2)}`;
+            vfDetail.innerText = "";
+
+        } catch (error) {
+            resultValue.innerText = "❌ Error";
+            resultDetail.innerText = error.message;
+            interestDetail.innerText = "";
+            vfMensualDetail.innerText = "";
+            vfDetail.innerText = "";
+        }
     });
 </script>
 {% endblock %}

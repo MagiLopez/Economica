@@ -1,10 +1,6 @@
 from flask import render_template, request, jsonify, session, redirect, url_for
+import requests  # Para hacer peticiones a FastAPI
 from app import app
-
-# Usuarios de prueba
-USERS = {
-    "123": '123'
-}
 
 @app.route('/')
 def index():
@@ -16,45 +12,103 @@ def index():
 def login():
     if request.method == 'POST':
         data = request.json
-        username = data.get('username')
+        cedula = data.get('username')
         password = data.get('password')
         
-        if username in USERS and USERS[username] == password:
-            session['username'] = username
-            return jsonify({'success': True})
-        else:
-            return jsonify({'success': False, 'error': 'Usuario o contraseña incorrectos'})
+        try:
+            # Hacer petición a FastAPI para validar login
+            fastapi_response = requests.post(
+                "http://127.0.0.1:5000/validar_login",
+                json={"cedula": cedula, "password": password},
+                timeout=5
+            )
+            
+            if fastapi_response.status_code == 200:
+                result = fastapi_response.json()
+                if result.get('success'):
+                    # Buscar el usuario en la API para obtener su nombre
+                    usuarios_response = requests.get("http://127.0.0.1:5000/usuarios")
+                    if usuarios_response.status_code == 200:
+                        usuarios_data = usuarios_response.json()
+                        usuarios = usuarios_data.get('usuarios', [])
+                        
+                        # Buscar el usuario específico
+                        usuario_encontrado = None
+                        for usuario in usuarios:
+                            if usuario.get('cedula') == cedula:
+                                usuario_encontrado = usuario
+                                break
+                        
+                        if usuario_encontrado:
+                            session['username'] = usuario_encontrado.get('nombre', f'Usuario {cedula}')
+                            return jsonify({'success': True, 'message': f"Bienvenido {session['username']}"})
+                    
+                    # Si no se encuentra el nombre, usar cédula
+                    session['username'] = f'Usuario {cedula}'
+                    return jsonify({'success': True, 'message': f"Bienvenido {session['username']}"})
+            
+            # Si FastAPI devuelve error
+            if fastapi_response.status_code == 404:
+                return jsonify({'success': False, 'error': 'Usuario no encontrado'})
+            else:
+                return jsonify({'success': False, 'error': 'Credenciales inválidas'})
+                
+        except requests.RequestException as e:
+            print(f"Error conectando con FastAPI: {e}")
+            return jsonify({'success': False, 'error': 'Error de conexión con el servidor'})
     
     return render_template('login.html')
 
-# Nueva ruta para el login con Google (simplificado)
+# Ruta auxiliar para crear sesión (si usas la Opción 1)
+@app.route('/create-session', methods=['POST'])
+def create_session():
+    try:
+        data = request.json
+        cedula = data.get('cedula')
+        
+        # Obtener información del usuario desde FastAPI
+        usuarios_response = requests.get("http://127.0.0.1:5000/usuarios")
+        if usuarios_response.status_code == 200:
+            usuarios_data = usuarios_response.json()
+            usuarios = usuarios_data.get('usuarios', [])
+            
+            for usuario in usuarios:
+                if usuario.get('cedula') == cedula:
+                    session['username'] = usuario.get('nombre', f'Usuario {cedula}')
+                    return jsonify({'success': True})
+        
+        session['username'] = f'Usuario {cedula}'
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/google-login', methods=['POST'])
 def google_login():
     try:
         data = request.json
-        user_name = data.get('name')  # Nombre del usuario de Google
-        user_email = data.get('email')  # Email del usuario de Google
+        user_name = data.get('name')
+        user_email = data.get('email')
         
-        # Usar el nombre o email como username para la sesión
         username = user_name if user_name else user_email.split('@')[0]
-        
-        # Simplemente crear la sesión sin validación adicional
         session['username'] = username
-        session['google_user'] = True  # Marcar como usuario de Google
+        session['google_user'] = True
         
         return jsonify({'success': True, 'message': 'Login con Google exitoso'})
         
     except Exception as e:
         return jsonify({'success': False, 'error': 'Error al procesar login con Google'})
 
-
 @app.route('/inicio')
 def inicio():
-    return render_template('index.html',)
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template('index.html', username=session['username'])
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('google_user', None)
     return redirect(url_for('login'))
 
 @app.route('/simple')
@@ -81,22 +135,6 @@ def anualidades():
         return redirect(url_for('login'))
     return render_template('anualidades.html', username=session['username'])
 
-@app.route('/registro', methods=['GET', 'POST'])
+@app.route('/registro')
 def register():
-    if request.method == 'POST':
-        data = request.json
-        username = data.get('cedula')
-        password = data.get('password')
-
-        # Validación simple
-        if not username or not password:
-           return jsonify({'success': False, 'error': 'Todos los campos son obligatorios'})
-
-        if username in USERS:
-            return jsonify({'success': False, 'error': 'El usuario ya existe'})
-
-        # Registrar usuario en el diccionario temporal
-        USERS[username] = password
-        return jsonify({'success': True, 'message': 'Usuario registrado con éxito'})
-
     return render_template('registro.html')
