@@ -122,7 +122,8 @@
             if (response.ok) {
                 // Si esperas Vf
                 if (data.Vf !== undefined) {
-                    resultDetail.innerText = `${data.Vf}`;
+                    resultDetail.innerText = ` Monto final: ${data.Vf[0]}
+                    Interes: ${data.Vf[1]}`;
                 }
                 // Si esperas Vi
                 else if (data.Vi !== undefined) {
@@ -130,7 +131,8 @@
                 }
                 // Si esperas tiempo
                 else if (data.t !== undefined) {
-                    resultDetail.innerText = `${data.t}`;
+                    const porcentaje =(data.t*100)
+                    resultDetail.innerText = `${porcentaje.toFixed(3)}`;
                 }
                 else {
                     resultDetail.innerText = "No se pudo calcular.";

@@ -31,18 +31,24 @@ class Interes_Simple(BaseModel):
     t_a:opcional[float]=None
     t_m:opcional[float]=None
     t_d:opcional[float]=None
+    t: opcional[float] = None 
    
     def calcular_valor_futuro(self):
-        self.Vf = self.Vi * (1 + self.i * convertir_tiempo(self.t_a, self.t_m, self.t_d))
-        return self.Vf
+        tiempo = convertir_tiempo(self.t_a, self.t_m, self.t_d)
+        self.Vf = self.Vi * (1 + self.i * tiempo)
+        interes = self.Vf - self.Vi
+        return { round(self.Vf, 2), round(interes, 2)}
+
 
     def calcular_valor_inicial(self):
         self.Vi = self.Vf / (1 + self.i * convertir_tiempo(self.t_a, self.t_m, self.t_d))
         return self.Vi
      
     def calcular_tiempo(self):
-        self.t = ((self.Vf / self.Vi) - 1) / self.i
-        return self.t
+            if not self.Vi or not self.Vf or not self.i:
+                raise ValueError("Faltan Vf, Vi o i para calcular el tiempo")
+            self.t = ((self.Vf / self.Vi) - 1) / self.i
+            return self.t
     
 class Interes_compuesto(BaseModel):
     Vf:opcional[float]=None
