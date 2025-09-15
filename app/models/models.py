@@ -66,7 +66,7 @@ class Interes_compuesto(BaseModel):
     
     def calcular_tiempo_necesario(self):
         self.n=(math.log(self.Vf)-math.log(self.Vp))/math.log(1+(self.i/100))
-        return self.n/100
+        return self.n
 
 class Tasa_interes(BaseModel):
     Vp:opcional[float]=None
