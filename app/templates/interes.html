@@ -10,9 +10,9 @@
         <span class="user-info">{{ username }}</span>
     </div>
     
-    <p>Completa exactamente <strong>2 campos</strong> y deja <strong>1 vacío</strong>. El cálculo se realizará en el servidor.</p>
+    <p>Completa exactamente <strong>los 3 campos</strong>  El cálculo se realizará en el servidor.</p>
 
-    <form id="interesForm">
+    <form id="interesForm" method="post">
         <div class="input-row">
             <div class="input-group">
                 <label for="capital">Capital (C):</label>
@@ -24,7 +24,7 @@
         </div>
         <div class="input-row">
             <div class="input-group">
-                <label for="tiempo">Tiempo (años):</label>
+                <label for="tiempo">Tiempo (meses):</label>
                 <input type="number" id="tiempo" name="tiempo">
             </div>
 
@@ -50,80 +50,88 @@
 </div>
 
 <script>
-   const form = document.getElementById('interesForm');
-    const capitalInput = document.getElementById('capital');
-    const tiempoInput = document.getElementById('tiempo');
-    const tasaInput = document.getElementById('tasa');
-    const resultBox = document.getElementById('resultBox');
-    const resultValue = document.getElementById('resultValue');
-    const resultDetail = document.getElementById('resultDetail');
-    const interestDetail = document.getElementById('interestDetail');
-    const vfMensualDetail = document.getElementById('vfMensualDetail');
-    const vfDetail = document.getElementById('vfDetail');
+const form = document.getElementById('interesForm');
+const capitalInput = document.getElementById('capital');
+const tiempoInput = document.getElementById('tiempo');
+const tasaInput = document.getElementById('tasa');
+const resultBox = document.getElementById('resultBox');
+const resultValue = document.getElementById('resultValue');
+const resultDetail = document.getElementById('resultDetail');
+const interestDetail = document.getElementById('interestDetail');
 
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
+form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    console.log("Interceptado, no se hace GET");
 
-        let filled = 0;
-        if (capitalInput.value) filled++;
-        if (tiempoInput.value) filled++;
-        if (tasaInput.value) filled++;
-
-        if (filled !== 2) {
-            resultBox.classList.remove('hidden');
-            resultValue.innerText = "⚠ Error de validación";
-            resultDetail.innerText = "Debes completar exactamente 2 campos y dejar 1 vacío.";
-            interestDetail.innerText = "";
-            vfMensualDetail.innerText = "";
-            vfDetail.innerText = "";
-            return;
-        }
-
-        // Mostrar loading
+    // Validar que se ingresen las 3 variables
+    if (!capitalInput.value || !tiempoInput.value || !tasaInput.value) {
         resultBox.classList.remove('hidden');
-        resultValue.innerText = "⏳ Calculando...";
-        resultDetail.innerText = "";
+        resultValue.innerText = "⚠ Campos requeridos";
+        resultDetail.innerText = "Debes completar los 3 campos: Capital, Tiempo y Tasa de Interés.";
         interestDetail.innerText = "";
-        vfMensualDetail.innerText = "";
-        vfDetail.innerText = "";
+        return;
+    }
 
-        try {
-            // Preparar datos para enviar
-            const requestData = {
-                capital: capitalInput.value ? parseFloat(capitalInput.value) : null,
-                tiempo: tiempoInput.value ? parseFloat(tiempoInput.value) : null,
-                tasa: tasaInput.value ? parseFloat(tasaInput.value) : null
-            };
+    // Mostrar loading
+    resultBox.classList.remove('hidden');
+    resultValue.innerText = "⏳ Calculando...";
+    resultDetail.innerText = "Enviando datos al servidor...";
+    interestDetail.innerText = "";
 
-            // Enviar solicitud al backend
-            const response = await fetch('http://127.0.0.1:5000/calcular_Tasa_de_Interes', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestData)
-            });
+    try {
+        // Preparar datos - ahora con los nombres correctos del modelo backend
+        const requestData = {
+            Vp: parseFloat(capitalInput.value),           // Capital -> Vp
+            n: parseFloat(tiempoInput.value),             // Tiempo -> n  
+            i: parseFloat(tasaInput.value) / 100          // Tasa % -> decimal
+        };
 
-            if (!response.ok) {
-                throw new Error(`Error del servidor: ${response.status}`);
-            }
+        console.log('Enviando datos:', requestData);
 
-            const data = await response.json();
+        // Cambiar la URL al puerto correcto (8000 para FastAPI)
+        const response = await fetch('http://127.0.0.1:5000/calcular_Tasa_de_Interes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        });
 
-            // Mostrar resultados
-            resultValue.innerText = "✅ Cálculo completado";
-            resultDetail.innerText = `Tasa de interés mensual: ${data.i_mensual.toFixed(4)}%`;
-            interestDetail.innerText = `Valor futuro mensual: $${data.Vf_mensual.toFixed(2)}`;
-            vfMensualDetail.innerText = `Valor futuro total: $${data.Vf.toFixed(2)}`;
-            vfDetail.innerText = "";
-
-        } catch (error) {
-            resultValue.innerText = "❌ Error";
-            resultDetail.innerText = error.message;
-            interestDetail.innerText = "";
-            vfMensualDetail.innerText = "";
-            vfDetail.innerText = "";
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
         }
-    });
+
+        const data = await response.json();
+        console.log('Respuesta del servidor:', data);
+
+        // Mostrar resultados usando solo los elementos que existen en tu HTML
+        resultValue.innerText = "✅ Cálculo completado";
+        resultDetail.innerText = `📊 Tasa de interés mensual: ${data.i_mensual.toFixed(4)}%`;
+        interestDetail.innerText = `💰 Valor futuro mensual: $${data.Vf_mensual.toFixed(2)} | Valor futuro total: $${data.Vf.toFixed(2)}`;
+
+    } catch (error) {
+        console.error('Error completo:', error);
+        resultValue.innerText = "❌ Error en el cálculo";
+        resultDetail.innerText = `Error: ${error.message}`;
+        interestDetail.innerText = "Verifica que el servidor esté ejecutándose y los datos sean válidos.";
+    }
+});
+
+// Función para limpiar el formulario
+function limpiarFormulario() {
+    capitalInput.value = '';
+    tiempoInput.value = '';
+    tasaInput.value = '';
+    resultBox.classList.add('hidden');
+}
+
+// Agregar botón de limpiar si existe
+const limpiarBtn = document.getElementById('limpiarBtn');
+if (limpiarBtn) {
+    limpiarBtn.addEventListener('click', limpiarFormulario);
+}
 </script>
+
+
 {% endblock %}

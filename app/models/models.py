@@ -80,7 +80,7 @@ class Tasa_interes(BaseModel):
         Vf=self.Vp*math.pow((1+calcular_tasa_de_interes(self.i,self.n)),self.n)
         return Vf
 
-class anualidades(BaseModel):
+class Anualidad(BaseModel):
     vf:opcional[float]=None
     va:opcional[float]=None
     i:float
