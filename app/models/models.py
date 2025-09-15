@@ -35,19 +35,19 @@ class Interes_Simple(BaseModel):
    
     def calcular_valor_futuro(self):
         tiempo = convertir_tiempo(self.t_a, self.t_m, self.t_d)
-        self.Vf = self.Vi * (1 + self.i * tiempo)
+        self.Vf = self.Vi * (1 + (self.i/100) * tiempo)
         interes = self.Vf - self.Vi
         return { round(self.Vf, 2), round(interes, 2)}
 
 
     def calcular_valor_inicial(self):
-        self.Vi = self.Vf / (1 + self.i * convertir_tiempo(self.t_a, self.t_m, self.t_d))
+        self.Vi = self.Vf / (1 + (self.i/100) * convertir_tiempo(self.t_a, self.t_m, self.t_d))
         return self.Vi
      
     def calcular_tiempo(self):
             if not self.Vi or not self.Vf or not self.i:
                 raise ValueError("Faltan Vf, Vi o i para calcular el tiempo")
-            self.t = ((self.Vf / self.Vi) - 1) / self.i
+            self.t = ((self.Vf / self.Vi) - 1) /(self.i/100)
             return self.t
     
 class Interes_compuesto(BaseModel):
@@ -57,7 +57,7 @@ class Interes_compuesto(BaseModel):
     n:opcional[float]=None
 
     def calcular_valor_futuro(self):
-        self.Vf=self.Vp*math.pow((1+self.i),self.n)
+        self.Vf=self.Vp*math.pow((1+(self.i/100)),self.n)
         return self.Vf
     
     def calcular_tasa_de_interes(self):
@@ -65,8 +65,8 @@ class Interes_compuesto(BaseModel):
         return self.i*100
     
     def calcular_tiempo_necesario(self):
-        self.n=(math.log(self.Vf)-math.log(self.Vp))/math.log(1+self.i)
-        return self.n
+        self.n=(math.log(self.Vf)-math.log(self.Vp))/math.log(1+(self.i/100))
+        return self.n/100
 
 class Tasa_interes(BaseModel):
     Vp:opcional[float]=None
@@ -75,15 +75,15 @@ class Tasa_interes(BaseModel):
     
     
     def calcular_tasa_de_interes_por_periodos(self):
-        i_mensual=math.pow((1+self.i),(1/self.n))-1
+        i_mensual=math.pow((1+(self.i/100)),(1/self.n))-1
         return i_mensual*100
     
     def calcular_valor_futuro_mensual(self):
-        Vf_mensual=self.Vp*(calcular_tasa_de_interes(self.i,self.n)/(1 - math.pow((1+ calcular_tasa_de_interes(self.i,self.n)),-self.n)))
+        Vf_mensual=self.Vp*(calcular_tasa_de_interes((self.i/100),self.n)/(1 - math.pow((1+ calcular_tasa_de_interes(self.i,self.n)),-self.n)))
         return Vf_mensual
 
     def calcular_valor_futuro(self):
-        Vf=self.Vp*math.pow((1+calcular_tasa_de_interes(self.i,self.n)),self.n)
+        Vf=self.Vp*math.pow((1+calcular_tasa_de_interes((self.i/100),self.n)),self.n)
         return Vf
 
 class Anualidad(BaseModel):
@@ -94,10 +94,10 @@ class Anualidad(BaseModel):
     A:float
 
     def calcular_valor_futuro_anualidad(self):
-        self.vf=self.A*(((math.pow((1+self.i),self.n)-1)/self.i))
+        self.vf=self.A*(((math.pow((1+(self.i/100)),self.n)-1)/(self.i/100)))
         return self.vf
 
     def calcular_valor_anualidad(self):
-        self.va=self.A*(((1-(math.pow((1+self.i),-self.n)))/self.i))
+        self.va=self.A*(((1-(math.pow((1+(self.i/100)),-self.n)))/(self.i/100)))
         return self.va
     

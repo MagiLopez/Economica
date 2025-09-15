@@ -105,7 +105,7 @@
             // Preparar datos para enviar al backend
             const requestData = {
                 Vp: capitalInput.value ? parseFloat(capitalInput.value) : 0,
-                i: tasaInput.value ? parseFloat(tasaInput.value) / 100 : 0, // Convertir porcentaje a decimal
+                i: tasaInput.value ? parseFloat(tasaInput.value)  : 0, // Convertir porcentaje a decimal
                 n: tiempoLleno ? parseFloat(tiempoLleno) : 0,
                 Vf: montoInput.value ? parseFloat(montoInput.value) : 0
             };
@@ -154,19 +154,18 @@
                 tasaInput.value = tasaCalculada;
                 
             } else if (result.n !== undefined) {
-                // Se calculó el tiempo necesario
-                const tiempoCalculado = result.n.toFixed(2);
-                const años = Math.floor(result.n / 12);
-                const meses = Math.floor(result.n % 12);
-                
+                // Redondear el tiempo necesario en meses
+                const tiempoCalculado = Math.round(result.n);
+
                 resultDetail.innerText = `Tiempo Necesario: ${tiempoCalculado} meses`;
-                interestDetail.innerText = años > 0 ? 
-                    `Equivale a ${años} año(s) y ${meses} mes(es)` : 
-                    `Equivale a ${meses} mes(es)`;
                 
+                // Mostrar solo en meses redondeados
+                interestDetail.innerText = `Equivale a ${tiempoCalculado} meses`;
+
                 // Llenar el campo calculado
                 tiempoMesesInput.value = tiempoCalculado;
             }
+
 
         } catch (error) {
             console.error('Error:', error);
