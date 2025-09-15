@@ -5,7 +5,6 @@ router=APIRouter()
 tasa_interes=Tasa_interes()
 
 @router.post("/calcular_Tasa_de_Interes")
-
 def calcular_Tasa_de_Interes(data:Tasa_interes):
     resultado = [0,0,0]   
     resultado[0]= data.calcular_tasa_de_interes_por_periodos() 

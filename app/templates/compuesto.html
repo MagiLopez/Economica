@@ -34,10 +34,10 @@
 
         <div class="input-row">
             <div class="input-group">
-                <label>Período de la inversión:</label>
+                <label>Período:</label>
                 <div class="time-input">
-                    <input id="tiempo_meses" type="number" min="1" placeholder="Número de meses">
-                    <input id="tiempo_pagos" type="number" min="1" placeholder="Número de pagos">
+                    <input id="periodo" type="number" min="1" placeholder="Tiempo">
+                    
                 </div>
                 <small>Indica la duración en meses y cuántos pagos se hacen en total</small>
             </div>
@@ -67,19 +67,19 @@
     const form = document.getElementById('compoundForm');
     const capitalInput = document.getElementById('capital');
     const tasaInput = document.getElementById('tasa');
-    const tiempoMesesInput = document.getElementById('tiempo_meses');
-    const tiempoPagosInput = document.getElementById('tiempo_pagos');
+    const tiempoMesesInput = document.getElementById('periodo');
     const montoInput = document.getElementById('monto');
     const resultBox = document.getElementById('resultBox');
     const resultValue = document.getElementById('resultValue');
     const resultDetail = document.getElementById('resultDetail');
     const interestDetail = document.getElementById('interestDetail');
 
-    form.addEventListener('submit', function (e) {
+    
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        // Considerar el tiempo como un solo campo (meses o pagos)
-        const tiempoLleno = tiempoMesesInput.value || tiempoPagosInput.value;
+        // Considerar el tiempo como un solo campo (meses)
+        const tiempoLleno = tiempoMesesInput.value;
 
         let filled = 0;
         if (capitalInput.value) filled++;
@@ -95,11 +95,100 @@
             return;
         }
 
+        // Mostrar estado de carga
         resultBox.classList.remove('hidden');
-        resultValue.innerText = "✔ Validación correcta";
-        resultDetail.innerText = "Cálculo listo para ejecutarse.";
-        interestDetail.innerText = "Aquí aparecerán los resultados reales.";
-    });
-</script>
+        resultValue.innerText = "🔄 Calculando...";
+        resultDetail.innerText = "Enviando datos al servidor...";
+        interestDetail.innerText = "";
 
+        try {
+            // Preparar datos para enviar al backend
+            const requestData = {
+                Vp: capitalInput.value ? parseFloat(capitalInput.value) : 0,
+                i: tasaInput.value ? parseFloat(tasaInput.value) / 100 : 0, // Convertir porcentaje a decimal
+                n: tiempoLleno ? parseFloat(tiempoLleno) : 0,
+                Vf: montoInput.value ? parseFloat(montoInput.value) : 0
+            };
+
+            console.log('Enviando datos:', requestData);
+
+            // Realizar petición al backend
+            const response = await fetch(`http://127.0.0.1:5000/calcular_Interes_Compuesto`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Error en el servidor');
+            }
+
+            const result = await response.json();
+            console.log('Respuesta del servidor:', result);
+
+            // Mostrar resultados
+            resultValue.innerText = "✔ Cálculo completado";
+            
+            if (result.Vf !== undefined) {
+                // Se calculó el valor futuro
+                const valorFuturo = result.Vf.toFixed(2);
+                const interes = (result.Vf - parseFloat(capitalInput.value)).toFixed(2);
+                
+                resultDetail.innerText = `Monto Final: $${valorFuturo}`;
+                interestDetail.innerText = `Interés Ganado: $${interes}`;
+                
+                // Llenar el campo calculado
+                montoInput.value = valorFuturo;
+                
+            } else if (result.i !== undefined) {
+                // Se calculó la tasa de interés
+                const tasaCalculada = result.i.toFixed(4);
+                
+                resultDetail.innerText = `Tasa de Interés: ${tasaCalculada}%`;
+                interestDetail.innerText = `Tasa anual requerida para alcanzar el objetivo`;
+                
+                // Llenar el campo calculado
+                tasaInput.value = tasaCalculada;
+                
+            } else if (result.n !== undefined) {
+                // Se calculó el tiempo necesario
+                const tiempoCalculado = result.n.toFixed(2);
+                const años = Math.floor(result.n / 12);
+                const meses = Math.floor(result.n % 12);
+                
+                resultDetail.innerText = `Tiempo Necesario: ${tiempoCalculado} meses`;
+                interestDetail.innerText = años > 0 ? 
+                    `Equivale a ${años} año(s) y ${meses} mes(es)` : 
+                    `Equivale a ${meses} mes(es)`;
+                
+                // Llenar el campo calculado
+                tiempoMesesInput.value = tiempoCalculado;
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            resultValue.innerText = "❌ Error en el cálculo";
+            resultDetail.innerText = `Error: ${error.message}`;
+            interestDetail.innerText = "Por favor, verifica los datos ingresados.";
+        }
+    });
+
+    // Función para limpiar el formulario
+    function limpiarFormulario() {
+        capitalInput.value = '';
+        tasaInput.value = '';
+        tiempoMesesInput.value = '';
+        montoInput.value = '';
+        resultBox.classList.add('hidden');
+    }
+
+    // Opcional: Agregar botón de limpiar si no existe
+    const limpiarBtn = document.getElementById('limpiarBtn');
+    if (limpiarBtn) {
+        limpiarBtn.addEventListener('click', limpiarFormulario);
+    }
+</script>
 {% endblock %}
