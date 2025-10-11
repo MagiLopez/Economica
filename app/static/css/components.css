@@ -196,3 +196,110 @@
 .input-group.full-width select:hover::before {
     opacity: 1;
 }
+
+.teoria-section {
+        background: linear-gradient(135deg, #6b84f1 0%, #3a4e85 100%);
+        border-radius: 12px;
+        margin: 20px 0;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .teoria-toggle {
+        width: 100%;
+        padding: 18px 25px;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .teoria-toggle:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    #teoriaIcon {
+        font-size: 0.9em;
+        transition: transform 0.3s ease;
+        display: inline-block;
+    }
+
+    #teoriaIcon.rotated {
+        transform: rotate(90deg);
+    }
+
+    .teoria-content {
+        max-height: 0;
+        overflow: hidden;
+        background: white;
+        transition: max-height 0.4s ease, padding 0.4s ease;
+        padding: 0 25px;
+    }
+
+    .teoria-content.show {
+        max-height: 1000px;
+        padding: 25px;
+    }
+
+    .teoria-content h3 {
+        color: #667eea;
+        margin-top: 0;
+        font-size: 1.4em;
+    }
+
+    .teoria-content h4 {
+        color: #4e2d70;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .teoria-content p {
+        line-height: 1.6;
+        color: #555;
+    }
+
+    .teoria-content ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .teoria-content ul li {
+        padding: 8px 0;
+        padding-left: 25px;
+        position: relative;
+        line-height: 1.5;
+    }
+
+    .teoria-content ul li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #667eea;
+        font-weight: bold;
+    }
+
+    .formula-box {
+        background: #f8f9ff;
+        border-left: 4px solid #667eea;
+        padding: 15px 20px;
+        margin: 15px 0;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        line-height: 1.8;
+    }
+
+    .ejemplo-box {
+        background: #fff9e6;
+        border-left: 4px solid #ffd700;
+        padding: 15px 20px;
+        margin: 15px 0;
+        border-radius: 8px;
+        line-height: 1.8;
+    }

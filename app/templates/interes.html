@@ -10,6 +10,44 @@
         <span class="user-info">{{ username }}</span>
     </div>
     
+ <!-- Sección de Teoría Colapsable -->
+    <div class="teoria-section">
+        <button class="teoria-toggle" type="button" id="teoriaBtn">
+            <span id="teoriaIcon">▶</span> Teoría: ¿Qué es la Tasa de Interés?
+        </button>
+        <div class="teoria-content" id="teoriaContent">
+            <h3>💡 Conceptos Básicos</h3>
+            <p><strong>La tasa de interés</strong> es el porcentaje que se paga o cobra por el uso del dinero durante un período determinado. Es el "precio del dinero" en el tiempo.</p>
+            
+            <h4>Tipos de Tasas de Interés:</h4>
+            <div class="tipo-box">
+                <strong>🔹 Tasa Nominal:</strong> Es la tasa anual que se declara sin considerar la capitalización.<br>
+                <strong>🔹 Tasa Efectiva:</strong> Es la tasa real que considera la capitalización en períodos menores.<br>
+                <strong>🔹 Tasa Periódica:</strong> Tasa aplicable a cada período (mensual, trimestral, etc.)
+            </div>
+
+            <h4>Conversión de Tasas:</h4>
+            <div class="formula-box">
+                <strong>Tasa Periódica (mensual):</strong><br>
+                i_mensual = i_anual / 12<br><br>
+                <strong>Tasa Efectiva Anual (TEA):</strong><br>
+                TEA = (1 + i_periódica)ⁿ - 1<br><br>
+                <strong>Valor Futuro:</strong><br>
+                VF = VP × (1 + i)ⁿ
+            </div>
+
+            <h4>Variables:</h4>
+            <ul>
+                <li><strong>VP (Valor Presente):</strong> Capital inicial o actual</li>
+                <li><strong>VF (Valor Futuro):</strong> Monto acumulado después del tiempo</li>
+                <li><strong>i (Tasa de interés):</strong> Porcentaje de rendimiento o costo</li>
+                <li><strong>n (Tiempo):</strong> Número de períodos (meses, años, etc.)</li>
+            </ul>
+
+            
+        </div>
+    </div>
+    
     <p>Completa exactamente <strong>los 3 campos</strong>  El cálculo se realizará en el servidor.</p>
 
     <form id="interesForm" method="post">
@@ -50,87 +88,96 @@
 </div>
 
 <script>
-const form = document.getElementById('interesForm');
-const capitalInput = document.getElementById('capital');
-const tiempoInput = document.getElementById('tiempo');
-const tasaInput = document.getElementById('tasa');
-const resultBox = document.getElementById('resultBox');
-const resultValue = document.getElementById('resultValue');
-const resultDetail = document.getElementById('resultDetail');
-const interestDetail = document.getElementById('interestDetail');
 
-form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    console.log("Interceptado, no se hace GET");
+    // Función para toggle de teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
+        
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
+    });
+    const form = document.getElementById('interesForm');
+    const capitalInput = document.getElementById('capital');
+    const tiempoInput = document.getElementById('tiempo');
+    const tasaInput = document.getElementById('tasa');
+    const resultBox = document.getElementById('resultBox');
+    const resultValue = document.getElementById('resultValue');
+    const resultDetail = document.getElementById('resultDetail');
+    const interestDetail = document.getElementById('interestDetail');
 
-    // Validar que se ingresen las 3 variables
-    if (!capitalInput.value || !tiempoInput.value || !tasaInput.value) {
-        resultBox.classList.remove('hidden');
-        resultValue.innerText = "⚠ Campos requeridos";
-        resultDetail.innerText = "Debes completar los 3 campos: Capital, Tiempo y Tasa de Interés.";
-        interestDetail.innerText = "";
-        return;
-    }
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        console.log("Interceptado, no se hace GET");
 
-    // Mostrar loading
-    resultBox.classList.remove('hidden');
-    resultValue.innerText = "⏳ Calculando...";
-    resultDetail.innerText = "Enviando datos al servidor...";
-    interestDetail.innerText = "";
-
-    try {
-        // Preparar datos - ahora con los nombres correctos del modelo backend
-        const requestData = {
-            Vp: parseFloat(capitalInput.value),           // Capital -> Vp
-            n: parseFloat(tiempoInput.value),             // Tiempo -> n  
-            i: parseFloat(tasaInput.value) / 100          // Tasa % -> decimal
-        };
-
-        console.log('Enviando datos:', requestData);
-
-        // Cambiar la URL al puerto correcto (8000 para FastAPI)
-        const response = await fetch('http://127.0.0.1:5000/calcular_Tasa_de_Interes', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
+        // Validar que se ingresen las 3 variables
+        if (!capitalInput.value || !tiempoInput.value || !tasaInput.value) {
+            resultBox.classList.remove('hidden');
+            resultValue.innerText = "⚠ Campos requeridos";
+            resultDetail.innerText = "Debes completar los 3 campos: Capital, Tiempo y Tasa de Interés.";
+            interestDetail.innerText = "";
+            return;
         }
 
-        const data = await response.json();
-        console.log('Respuesta del servidor:', data);
+        // Mostrar loading
+        resultBox.classList.remove('hidden');
+        resultValue.innerText = "⏳ Calculando...";
+        resultDetail.innerText = "Enviando datos al servidor...";
+        interestDetail.innerText = "";
 
-        // Mostrar resultados usando solo los elementos que existen en tu HTML
-        resultValue.innerText = "✅ Cálculo completado";
-        resultDetail.innerText = `📊 Tasa de interés mensual: ${data.i_mensual.toFixed(4)}%`;
-        interestDetail.innerText = `💰 Valor futuro mensual: $${data.Vf_mensual.toFixed(2)} | Valor futuro total: $${data.Vf.toFixed(2)}`;
+        try {
+            // Preparar datos - ahora con los nombres correctos del modelo backend
+            const requestData = {
+                Vp: parseFloat(capitalInput.value),           // Capital -> Vp
+                n: parseFloat(tiempoInput.value),             // Tiempo -> n  
+                i: parseFloat(tasaInput.value) / 100          // Tasa % -> decimal
+            };
 
-    } catch (error) {
-        console.error('Error completo:', error);
-        resultValue.innerText = "❌ Error en el cálculo";
-        resultDetail.innerText = `Error: ${error.message}`;
-        interestDetail.innerText = "Verifica que el servidor esté ejecutándose y los datos sean válidos.";
+            console.log('Enviando datos:', requestData);
+
+            // Cambiar la URL al puerto correcto (8000 para FastAPI)
+            const response = await fetch('http://127.0.0.1:5000/calcular_Tasa_de_Interes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || `Error del servidor: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
+
+            // Mostrar resultados usando solo los elementos que existen en tu HTML
+            resultValue.innerText = "✅ Cálculo completado";
+            resultDetail.innerText = `📊 Tasa de interés mensual: ${data.i_mensual.toFixed(4)}%`;
+            interestDetail.innerText = `💰 Valor futuro mensual: $${data.Vf_mensual.toFixed(2)} | Valor futuro total: $${data.Vf.toFixed(2)}`;
+
+        } catch (error) {
+            console.error('Error completo:', error);
+            resultValue.innerText = "❌ Error en el cálculo";
+            resultDetail.innerText = `Error: ${error.message}`;
+            interestDetail.innerText = "Verifica que el servidor esté ejecutándose y los datos sean válidos.";
+        }
+    });
+
+    // Función para limpiar el formulario
+    function limpiarFormulario() {
+        capitalInput.value = '';
+        tiempoInput.value = '';
+        tasaInput.value = '';
+        resultBox.classList.add('hidden');
     }
-});
 
-// Función para limpiar el formulario
-function limpiarFormulario() {
-    capitalInput.value = '';
-    tiempoInput.value = '';
-    tasaInput.value = '';
-    resultBox.classList.add('hidden');
-}
-
-// Agregar botón de limpiar si existe
-const limpiarBtn = document.getElementById('limpiarBtn');
-if (limpiarBtn) {
-    limpiarBtn.addEventListener('click', limpiarFormulario);
-}
+    // Agregar botón de limpiar si existe
+    const limpiarBtn = document.getElementById('limpiarBtn');
+    if (limpiarBtn) {
+        limpiarBtn.addEventListener('click', limpiarFormulario);
+    }
 </script>
 
 

@@ -10,6 +10,43 @@
         <span class="user-info">{{ username }}</span>
     </div>
     
+<!-- Sección de Teoría Colapsable -->
+    <div class="teoria-section">
+        <button class="teoria-toggle" type="button" id="teoriaBtn">
+            <span id="teoriaIcon">▶</span> Teoría: ¿Qué son las Anualidades?
+        </button>
+        <div class="teoria-content" id="teoriaContent">
+            <h3>💡 Conceptos Básicos</h3>
+            <p><strong>Una anualidad</strong> es una serie de pagos o cobros iguales realizados a intervalos regulares de tiempo.</p>
+            
+            <h4>Tipos de Anualidades:</h4>
+            <div class="tipo-box">
+                <strong>🔹 Anualidad Ordinaria (Vencida):</strong> Los pagos se realizan al <strong>final</strong> de cada período.<br>
+                <strong>🔹 Anualidad Anticipada:</strong> Los pagos se realizan al <strong>inicio</strong> de cada período.
+            </div>
+
+            <h4>Fórmulas Principales:</h4>
+            <div class="formula-box">
+                <strong>Valor Futuro (VF):</strong><br>
+                VF = A × [(1 + i)ⁿ - 1] / i<br><br>
+                <strong>Valor Presente (VP):</strong><br>
+                VP = A × [1 - (1 + i)⁻ⁿ] / i<br><br>
+            
+            </div>
+
+            <h4>Variables:</h4>
+            <ul>
+                <li><strong>A (Renta):</strong> Pago periódico constante</li>
+                <li><strong>VP (Valor Presente):</strong> Valor actual de la anualidad</li>
+                <li><strong>VF (Valor Futuro):</strong> Valor acumulado al final</li>
+                <li><strong>i (Tasa):</strong> Tasa de interés por período</li>
+                <li><strong>n (Períodos):</strong> Número de pagos</li>
+            </ul>
+
+
+        </div>
+    </div>
+
     <p>Completa exactamente <strong>4 campos</strong> y deja <strong>1 vacío</strong>. El cálculo se realizará en el servidor.</p>
 
     <form id="anualidadesForm">
@@ -53,91 +90,99 @@
     </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('anualidadesForm');
-    const resultBox = document.getElementById('resultBox');
-    const resultValue = document.getElementById('resultValue');
-    const resultDetail = document.getElementById('resultDetail');
-
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Función para toggle de teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
         
-        // Obtener valores del formulario
-        const renta = parseFloat(document.getElementById('renta').value);
-        const n = parseFloat(document.getElementById('n').value);
-        const tasa = parseFloat(document.getElementById('tasa').value);
-        const calcular = document.getElementById('calcular').value;
-        
-        // Validar que todos los campos requeridos estén llenos
-        if (isNaN(renta) || isNaN(n) || isNaN(tasa)) {
-            alert('Por favor, completa todos los campos requeridos (Renta, Períodos y Tasa)');
-            return;
-        }
-
-        // Preparar datos según lo que se quiere calcular
-        let data = {
-            A: renta,
-            n: n,
-            i: tasa
-        };
-
-        // Configurar qué campo dejar en 0 según la selección
-        if (calcular === 'vf') {
-            data.vf = 0;
-            data.va = null;
-        } else if (calcular === 'va') {
-            data.va = 0;
-            data.vf = null;
-        }
-
-        try {
-            // Mostrar loading
-            document.getElementById('calcularBtn').textContent = 'Calculando...';
-            document.getElementById('calcularBtn').disabled = true;
-
-            // Hacer petición al backend
-            const response = await fetch('http://127.0.0.1:5000/calcular_Anualidad', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Error en el cálculo');
-            }
-
-            const result = await response.json();
-            
-            // Mostrar resultado
-            let calculatedValue;
-            let resultText;
-            
-            if (result.vf !== undefined) {
-                calculatedValue = result.vf;
-                resultText = 'Valor Futuro';
-            } else if (result.va !== undefined) {
-                calculatedValue = result.va;
-                resultText = 'Valor Presente';
-            }
-
-            resultValue.textContent = `$${calculatedValue.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            resultDetail.textContent = `${resultText} calculado con los parámetros ingresados`;
-            
-            // Mostrar caja de resultado
-            resultBox.classList.remove('hidden');
-            
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        } finally {
-            // Restaurar botón
-            document.getElementById('calcularBtn').textContent = 'Calcular';
-            document.getElementById('calcularBtn').disabled = false;
-        }
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
     });
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('anualidadesForm');
+        const resultBox = document.getElementById('resultBox');
+        const resultValue = document.getElementById('resultValue');
+        const resultDetail = document.getElementById('resultDetail');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Obtener valores del formulario
+            const renta = parseFloat(document.getElementById('renta').value);
+            const n = parseFloat(document.getElementById('n').value);
+            const tasa = parseFloat(document.getElementById('tasa').value);
+            const calcular = document.getElementById('calcular').value;
+            
+            // Validar que todos los campos requeridos estén llenos
+            if (isNaN(renta) || isNaN(n) || isNaN(tasa)) {
+                alert('Por favor, completa todos los campos requeridos (Renta, Períodos y Tasa)');
+                return;
+            }
+
+            // Preparar datos según lo que se quiere calcular
+            let data = {
+                A: renta,
+                n: n,
+                i: tasa
+            };
+
+            // Configurar qué campo dejar en 0 según la selección
+            if (calcular === 'vf') {
+                data.vf = 0;
+                data.va = null;
+            } else if (calcular === 'va') {
+                data.va = 0;
+                data.vf = null;
+            }
+
+            try {
+                // Mostrar loading
+                document.getElementById('calcularBtn').textContent = 'Calculando...';
+                document.getElementById('calcularBtn').disabled = true;
+
+                // Hacer petición al backend
+                const response = await fetch('http://127.0.0.1:5000/calcular_Anualidad', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error en el cálculo');
+                }
+
+                const result = await response.json();
+                
+                // Mostrar resultado
+                let calculatedValue;
+                let resultText;
+                
+                if (result.vf !== undefined) {
+                    calculatedValue = result.vf;
+                    resultText = 'Valor Futuro';
+                } else if (result.va !== undefined) {
+                    calculatedValue = result.va;
+                    resultText = 'Valor Presente';
+                }
+
+                resultValue.textContent = `$${calculatedValue.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                resultDetail.textContent = `${resultText} calculado con los parámetros ingresados`;
+                
+                // Mostrar caja de resultado
+                resultBox.classList.remove('hidden');
+                
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                // Restaurar botón
+                document.getElementById('calcularBtn').textContent = 'Calcular';
+                document.getElementById('calcularBtn').disabled = false;
+            }
+        });
+    });
 </script>
 
 {% endblock %}

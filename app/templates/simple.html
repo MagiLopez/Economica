@@ -12,6 +12,32 @@
         <span class="user-info">{{ username }}</span>
     </div>
 
+<div class="teoria-section">
+        <button class="teoria-toggle" type="button" id="teoriaBtn">
+            <span id="teoriaIcon">▶</span> Teoría: ¿Qué es el Interés Simple?
+        </button>
+        <div class="teoria-content" id="teoriaContent">
+            <h3>💡 Conceptos Básicos</h3>
+            <p><strong>El interés simple</strong> es el interés que se calcula sobre el capital inicial durante todo el período de la inversión.</p>
+            
+            <h4>Fórmula Principal:</h4>
+            <div class="formula-box">
+                <strong>M = P + I</strong><br>
+                <strong>I = P × i × t</strong><br>
+                Donde: <strong>M = P(1 + i × t)</strong>
+            </div>
+
+            <h4>Variables:</h4>
+            <ul>
+                <li><strong>P (Capital):</strong> Dinero inicial invertido</li>
+                <li><strong>i (Tasa):</strong> Porcentaje de interés anual (en decimal)</li>
+                <li><strong>t (Tiempo):</strong> Período en años</li>
+                <li><strong>M (Monto):</strong> Capital final = Capital + Interés</li>
+                <li><strong>I (Interés):</strong> Ganancia generada</li>
+            </ul>
+        </div>
+    </div>
+
     <p class="instruction">Completa <strong>3 campos</strong> y deja <strong>1 vacío</strong>. FINLY calculará automáticamente el campo faltante.</p>
 
     <form class="form" id="simpleForm">
@@ -63,6 +89,15 @@
     <a href="/" class="btn-back">⬅ Volver al Menú</a>
 </div>
 <script>
+    // Función para toggle de teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
+        
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
+    });
+
     const form = document.getElementById('simpleForm');
     const capitalInput = document.getElementById('capital');
     const tasaInput = document.getElementById('tasa');
