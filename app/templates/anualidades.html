@@ -29,20 +29,16 @@
             <div class="input-group">
                 <label for="tasa">Tasa de interés (i):</label>
                 <input type="number" id="tasa" name="tasa" step="0.01">
+                <small> </small>
             </div>
-
-            <div class="input-group">
-                <label for="vp">Valor Presente (VP):</label>
-                <input type="number" id="vp" name="vp">
+        <div class="input-group full-width">
+                <label for="calcular">¿Qué deseas calcular?</label>
+                <select id="calcular" name="calcular">
+                    <option value="vf">Valor Futuro (VF)</option>
+                    <option value="va">Valor Presente (VA)</option>
+                </select>
             </div>
-        </div>
-
-        <div class="input-row">
-            <div class="input-group">
-                <label for="vf">Valor Futuro (VF):</label>
-                <input type="number" id="vf" name="vf">
-                 <small> </small>
-            </div>
+           
         </div>
 
         <button type="submit" class="btn" id="calcularBtn"> Calcular</button>
@@ -56,38 +52,92 @@
         </div>
     </div>
 </div>
-
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('anualidadesForm');
-    const rentaInput = document.getElementById('renta');
-    const nInput = document.getElementById('n');
-    const tasaInput = document.getElementById('tasa');
-    const vpInput = document.getElementById('vp');
-    const vfInput = document.getElementById('vf');
     const resultBox = document.getElementById('resultBox');
     const resultValue = document.getElementById('resultValue');
     const resultDetail = document.getElementById('resultDetail');
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
-
-        let filled = 0;
-        if (rentaInput.value) filled++;
-        if (nInput.value) filled++;
-        if (tasaInput.value) filled++;
-        if (vpInput.value) filled++;
-        if (vfInput.value) filled++;
-
-        if (filled !== 4) {
-            resultBox.classList.remove('hidden');
-            resultValue.innerText = "⚠ Validación incorrecta";
-            resultDetail.innerText = "Debes completar exactamente 4 campos y dejar 1 vacío.";
+        
+        // Obtener valores del formulario
+        const renta = parseFloat(document.getElementById('renta').value);
+        const n = parseFloat(document.getElementById('n').value);
+        const tasa = parseFloat(document.getElementById('tasa').value);
+        const calcular = document.getElementById('calcular').value;
+        
+        // Validar que todos los campos requeridos estén llenos
+        if (isNaN(renta) || isNaN(n) || isNaN(tasa)) {
+            alert('Por favor, completa todos los campos requeridos (Renta, Períodos y Tasa)');
             return;
         }
 
-        resultBox.classList.remove('hidden');
-        resultValue.innerText = "✔ Validación correcta";
-        resultDetail.innerText = "Cálculo listo para ejecutarse en el servidor.";
+        // Preparar datos según lo que se quiere calcular
+        let data = {
+            A: renta,
+            n: n,
+            i: tasa
+        };
+
+        // Configurar qué campo dejar en 0 según la selección
+        if (calcular === 'vf') {
+            data.vf = 0;
+            data.va = null;
+        } else if (calcular === 'va') {
+            data.va = 0;
+            data.vf = null;
+        }
+
+        try {
+            // Mostrar loading
+            document.getElementById('calcularBtn').textContent = 'Calculando...';
+            document.getElementById('calcularBtn').disabled = true;
+
+            // Hacer petición al backend
+            const response = await fetch('http://127.0.0.1:5000/calcular_Anualidad', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Error en el cálculo');
+            }
+
+            const result = await response.json();
+            
+            // Mostrar resultado
+            let calculatedValue;
+            let resultText;
+            
+            if (result.vf !== undefined) {
+                calculatedValue = result.vf;
+                resultText = 'Valor Futuro';
+            } else if (result.va !== undefined) {
+                calculatedValue = result.va;
+                resultText = 'Valor Presente';
+            }
+
+            resultValue.textContent = `$${calculatedValue.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            resultDetail.textContent = `${resultText} calculado con los parámetros ingresados`;
+            
+            // Mostrar caja de resultado
+            resultBox.classList.remove('hidden');
+            
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        } finally {
+            // Restaurar botón
+            document.getElementById('calcularBtn').textContent = 'Calcular';
+            document.getElementById('calcularBtn').disabled = false;
+        }
     });
+});
 </script>
+
 {% endblock %}
