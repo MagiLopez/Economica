@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Capitalización{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-small">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+        <h1>💰 Capitalización</h1>
+        <span class="user-info">{{ username }}</span>
+    </div>
+
+    <!-- Sección de Teoría Colapsable -->
+    <div class="teoria-section">
+        <button class="teoria-toggle" type="button" id="teoriaBtn">
+            <span id="teoriaIcon">▶</span> Teoría: ¿Qué es la Capitalización?
+        </button>
+        <div class="teoria-content" id="teoriaContent">
+            <h3>💡 Conceptos Básicos</h3>
+            <p>La <strong>capitalización</strong> es el proceso mediante el cual los intereses generados por un capital se van sumando al mismo para generar nuevos intereses.  
+               Es el concepto fundamental del interés compuesto y el crecimiento exponencial del dinero en el tiempo.</p>
+
+            <h4>Tipos de Capitalización:</h4>
+            <div class="tipo-box">
+                <strong>🔹 Capitalización Simple:</strong> Los intereses no se reinvierten, solo se calculan sobre el capital inicial.<br>
+                <strong>🔹 Capitalización Compuesta:</strong> Los intereses se suman al capital y generan nuevos intereses.<br>
+                <strong>🔹 Capitalización Continua:</strong> Los intereses se capitalizan de forma continua (límite matemático).
+            </div>
+
+            <h4>Fórmulas Principales:</h4>
+            <div class="formula-box">
+                <strong>Interés Simple:</strong><br>
+                VF = P × (1 + i × n)<br><br>
+
+                <strong>Interés Compuesto:</strong><br>
+                VF = P × (1 + i)ⁿ<br><br>
+
+                <strong>Capitalización con Frecuencia:</strong><br>
+                VF = P × (1 + i/m)^(m×n)<br>
+                <small>donde m = número de capitalizaciones por período</small><br><br>
+
+                <strong>Capitalización Continua:</strong><br>
+                VF = P × e^(i×n)<br>
+                <small>donde e ≈ 2.71828</small>
+            </div>
+
+            <h4>Variables:</h4>
+            <ul>
+                <li><strong>P (Capital Inicial):</strong> Monto inicial invertido o prestado</li>
+                <li><strong>VF (Valor Futuro):</strong> Capital acumulado al final del período</li>
+                <li><strong>i (Tasa de interés):</strong> Tasa por período</li>
+                <li><strong>n (Tiempo):</strong> Número de períodos</li>
+                <li><strong>m (Frecuencia):</strong> Veces que se capitaliza por período</li>
+            </ul>
+
+            <h4>Frecuencias de Capitalización Comunes:</h4>
+            <ul>
+                <li><strong>Anual:</strong> m = 1</li>
+                <li><strong>Semestral:</strong> m = 2</li>
+                <li><strong>Trimestral:</strong> m = 4</li>
+                <li><strong>Mensual:</strong> m = 12</li>
+                <li><strong>Diaria:</strong> m = 365</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>Ingresa los datos para calcular el valor futuro según diferentes métodos de capitalización. El cálculo se realizará cuando esté disponible la conexión.</p>
+
+    <form id="capitalizacionForm">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="capitalInicial">Capital Inicial (P):</label>
+                <input type="number" id="capitalInicial" name="capitalInicial" step="0.01">
+                <small>Monto inicial</small>
+            </div>
+
+            <div class="input-group">
+                <label for="tasa">Tasa de Interés (i):</label>
+                <input type="number" id="tasa" name="tasa" step="0.01">
+                <small>Tasa anual (%)</small>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="tiempo">Tiempo (n):</label>
+                <input type="number" id="tiempo" name="tiempo" step="0.01">
+                <small>Años</small>
+            </div>
+
+            <div class="input-group full-width">
+                <label for="tipoCapitalizacion">Tipo de Capitalización:</label>
+                <select id="tipoCapitalizacion" name="tipoCapitalizacion">
+                    <option value="simple">Interés Simple</option>
+                    <option value="compuesto">Interés Compuesto</option>
+                    <option value="frecuencia">Con Frecuencia Específica</option>
+                    <option value="continua">Capitalización Continua</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Campo de frecuencia (oculto por defecto) -->
+        <div class="input-row hidden" id="frecuenciaRow">
+            <div class="input-group full-width">
+                <label for="frecuencia">Frecuencia de Capitalización:</label>
+                <select id="frecuencia" name="frecuencia">
+                    <option value="1">Anual (1 vez/año)</option>
+                    <option value="2">Semestral (2 veces/año)</option>
+                    <option value="4">Trimestral (4 veces/año)</option>
+                    <option value="12">Mensual (12 veces/año)</option>
+                    <option value="52">Semanal (52 veces/año)</option>
+                    <option value="365">Diaria (365 veces/año)</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="button" class="btn" id="calcularBtn">📊 Calcular Capitalización</button>
+    </form>
+
+    <div class="result-box hidden" id="resultBox">
+        <div class="result-content">
+            <h3>💰 Resultado:</h3>
+            <div class="result-value" id="resultValue">—</div>
+            <div class="result-detail" id="resultDetail">El resultado aparecerá aquí.</div>
+            <div class="result-breakdown hidden" id="resultBreakdown">
+                <div class="breakdown-item">
+                    <span>Capital Inicial:</span>
+                    <span id="capitalInicialDisplay">—</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Intereses Ganados:</span>
+                    <span id="interesesDisplay">—</span>
+                </div>
+                <div class="breakdown-item total">
+                    <span>Valor Final:</span>
+                    <span id="valorFinalDisplay">—</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+</div>
+
+
+<script>
+    // Mostrar/ocultar la teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
+    });
+
+    // Mostrar/ocultar campo de frecuencia según el tipo seleccionado
+    document.getElementById('tipoCapitalizacion').addEventListener('change', function() {
+        const frecuenciaRow = document.getElementById('frecuenciaRow');
+        
+        if (this.value === 'frecuencia') {
+            frecuenciaRow.classList.remove('hidden');
+        } else {
+            frecuenciaRow.classList.add('hidden');
+        }
+    });
+
+    // Botón de cálculo (sin conexión backend)
+    document.getElementById('calcularBtn').addEventListener('click', function() {
+        const resultBox = document.getElementById('resultBox');
+        const resultValue = document.getElementById('resultValue');
+        const resultDetail = document.getElementById('resultDetail');
+        const resultBreakdown = document.getElementById('resultBreakdown');
+        const comparativaSection = document.getElementById('comparativaSection');
+        
+        // Obtener valores
+        const capitalInicial = parseFloat(document.getElementById('capitalInicial').value);
+        const tasa = parseFloat(document.getElementById('tasa').value);
+        const tiempo = parseFloat(document.getElementById('tiempo').value);
+        const tipoCapitalizacion = document.getElementById('tipoCapitalizacion').value;
+        
+        // Validar campos
+        if (isNaN(capitalInicial) || isNaN(tasa) || isNaN(tiempo)) {
+            alert('Por favor, completa todos los campos correctamente');
+            return;
+        }
+
+        if (capitalInicial <= 0 || tasa <= 0 || tiempo <= 0) {
+            alert('Todos los valores deben ser mayores a cero');
+            return;
+        }
+
+        // Validar frecuencia si es necesario
+        if (tipoCapitalizacion === 'frecuencia') {
+            const frecuencia = document.getElementById('frecuencia').value;
+            if (!frecuencia) {
+                alert('Por favor, selecciona una frecuencia de capitalización');
+                return;
+            }
+        }
+
+        // Mostrar mensaje temporal
+        resultValue.textContent = "—";
+        resultDetail.textContent = "El cálculo de capitalización estará disponible próximamente.";
+        resultBox.classList.remove('hidden');
+        resultBreakdown.classList.add('hidden');
+        
+        // Ocultar comparativa por ahora
+        comparativaSection.classList.add('hidden');
+    });
+</script>
+{% endblock %}

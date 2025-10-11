@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Gradientes{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-small">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+        <h1>📈 Gradientes</h1>
+        <span class="user-info">{{ username }}</span>
+    </div>
+
+    <!-- Sección de Teoría Colapsable -->
+    <div class="teoria-section">
+        <button class="teoria-toggle" type="button" id="teoriaBtn">
+            <span id="teoriaIcon">▶</span> Teoría: ¿Qué son los Gradientes?
+        </button>
+        <div class="teoria-content" id="teoriaContent">
+            <h3>💡 Conceptos Básicos</h3>
+            <p>Un <strong>gradiente aritmético</strong> es una serie de pagos o ingresos que cambian en una cantidad constante cada período.  
+               Es útil para analizar situaciones donde los flujos de efectivo crecen o disminuyen regularmente.</p>
+
+            <h4>Tipos de Gradientes:</h4>
+            <div class="tipo-box">
+                <strong>🔹 Gradiente Aritmético:</strong> Los pagos aumentan o disminuyen en una cantidad constante (G).<br>
+                <strong>🔹 Gradiente Geométrico:</strong> Los pagos cambian en un porcentaje constante por período.
+            </div>
+
+            <h4>Fórmulas Principales:</h4>
+            <div class="formula-box">
+                <strong>Valor Presente (VP) — Gradiente Aritmético:</strong><br>
+                VP = A × [(1 + i)ⁿ - 1] / (i(1 + i)ⁿ) + G × [((1 + i)ⁿ - i×n - 1) / (i²(1 + i)ⁿ)]<br><br>
+
+                <strong>Valor Futuro (VF) — Gradiente Aritmético:</strong><br>
+                VF = A × [(1 + i)ⁿ - 1] / i + G × [((1 + i)ⁿ - i×n - 1) / i²]
+            </div>
+
+            <h4>Variables:</h4>
+            <ul>
+                <li><strong>A:</strong> Primer pago o flujo base</li>
+                <li><strong>G:</strong> Incremento o decremento constante</li>
+                <li><strong>n:</strong> Número de períodos</li>
+                <li><strong>i:</strong> Tasa de interés por período</li>
+                <li><strong>VP / VF:</strong> Valor Presente o Futuro del gradiente</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>Completa exactamente <strong>4 campos</strong> y deja <strong>1 vacío</strong>. El cálculo se realizará cuando esté disponible la conexión.</p>
+
+    <form id="gradientesForm">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="A">Primer pago (A):</label>
+                <input type="number" id="A" name="A">
+            </div>
+
+            <div class="input-group">
+                <label for="G">Gradiente (G):</label>
+                <input type="number" id="G" name="G">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="n">Número de períodos (n):</label>
+                <input type="number" id="n" name="n">
+            </div>
+
+            <div class="input-group">
+                <label for="tasa">Tasa de interés (i):</label>
+                <input type="number" id="tasa" name="tasa" step="0.01">
+            </div>
+        </div>
+
+        <div class="input-group full-width">
+            <label for="calcular">¿Qué deseas calcular?</label>
+            <select id="calcular" name="calcular">
+                <option value="vf">Valor Futuro (VF)</option>
+                <option value="vp">Valor Presente (VP)</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn" id="calcularBtn">Calcular</button>
+    </form>
+
+    <div class="result-box hidden" id="resultBox">
+        <div class="result-content">
+            <h3>💰 Resultado:</h3>
+            <div class="result-value" id="resultValue">—</div>
+            <div class="result-detail" id="resultDetail">El resultado aparecerá aquí.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mostrar/ocultar la teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
+    });
+
+    // Botón de cálculo (sin conexión backend)
+    document.getElementById('calcularBtn').addEventListener('click', function() {
+        const resultBox = document.getElementById('resultBox');
+        const resultValue = document.getElementById('resultValue');
+        const resultDetail = document.getElementById('resultDetail');
+        
+        resultValue.textContent = "—";
+        resultDetail.textContent = "El cálculo estará disponible próximamente.";
+        resultBox.classList.remove('hidden');
+    });
+</script>
+{% endblock %}

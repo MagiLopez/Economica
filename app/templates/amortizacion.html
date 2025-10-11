@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Amortización{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-small">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+        <h1>📊 Amortización</h1>
+        <span class="user-info">{{ username }}</span>
+    </div>
+
+    <!-- Sección de Teoría Colapsable -->
+    <div class="teoria-section">
+        <button class="teoria-toggle" type="button" id="teoriaBtn">
+            <span id="teoriaIcon">▶</span> Teoría: ¿Qué es la Amortización?
+        </button>
+        <div class="teoria-content" id="teoriaContent">
+            <h3>💡 Conceptos Básicos</h3>
+            <p>La <strong>amortización</strong> es el proceso de pagar una deuda mediante pagos periódicos que cubren tanto el capital como los intereses.  
+               Cada cuota se divide en dos partes: intereses sobre el saldo pendiente y abono a capital.</p>
+
+            <h4>Tipos de Amortización:</h4>
+            <div class="tipo-box">
+                <strong>🔹 Amortización Francesa:</strong> Cuotas constantes durante todo el período.<br>
+                <strong>🔹 Amortización Alemana:</strong> Abono a capital constante, cuotas decrecientes.<br>
+                <strong>🔹 Amortización Americana:</strong> Solo se pagan intereses, el capital al final.
+            </div>
+
+            <h4>Fórmulas Principales:</h4>
+            <div class="formula-box">
+                <strong>Cuota Fija (Sistema Francés):</strong><br>
+                Cuota = P × [i × (1 + i)ⁿ] / [(1 + i)ⁿ - 1]<br><br>
+
+                <strong>Interés del período k:</strong><br>
+                Interés = Saldo × i<br><br>
+
+                <strong>Abono a capital del período k:</strong><br>
+                Abono = Cuota - Interés<br><br>
+
+                <strong>Saldo después del período k:</strong><br>
+                Saldo = Saldo anterior - Abono a capital
+            </div>
+
+            <h4>Variables:</h4>
+            <ul>
+                <li><strong>P (Capital):</strong> Monto del préstamo o deuda inicial</li>
+                <li><strong>i (Tasa):</strong> Tasa de interés por período</li>
+                <li><strong>n (Períodos):</strong> Número total de pagos</li>
+                <li><strong>Cuota:</strong> Pago periódico</li>
+                <li><strong>Saldo:</strong> Capital pendiente por pagar</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>Completa los campos requeridos para generar la tabla de amortización. El cálculo se realizará cuando esté disponible la conexión.</p>
+
+    <form id="amortizacionForm">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="capital">Capital (P):</label>
+                <input type="number" id="capital" name="capital" step="0.01">
+                <small>Monto del préstamo</small>
+            </div>
+
+            <div class="input-group">
+                <label for="tasa">Tasa de interés (i):</label>
+                <input type="number" id="tasa" name="tasa" step="0.01">
+                <small>Por período (%)</small>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="n">Número de períodos (n):</label>
+                <input type="number" id="n" name="n">
+                <small>Cantidad de cuotas</small>
+            </div>
+
+            <div class="input-group full-width">
+                <label for="tipoAmortizacion">Sistema de Amortización:</label>
+                <select id="calcular" name="calcular">
+                    <option value="frances">Sistema Francés (Cuota Fija)</option>
+                    <option value="aleman">Sistema Alemán (Abono Fijo)</option>
+                    <option value="americano">Sistema Americano</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="button" class="btn" id="calcularBtn">📋 Generar Tabla de Amortización</button>
+    </form>
+
+    <div class="result-box hidden" id="resultBox">
+        <div class="result-content">
+            <h3>💰 Resumen:</h3>
+            <div class="result-value" id="resultValue">—</div>
+            <div class="result-detail" id="resultDetail">El resultado aparecerá aquí.</div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script>
+    // Mostrar/ocultar la teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
+    });
+
+    // Botón de cálculo (sin conexión backend)
+    document.getElementById('calcularBtn').addEventListener('click', function() {
+        const resultBox = document.getElementById('resultBox');
+        const resultValue = document.getElementById('resultValue');
+        const resultDetail = document.getElementById('resultDetail');
+        const tablaAmortizacion = document.getElementById('tablaAmortizacion');
+        
+        // Obtener valores del formulario
+        const capital = parseFloat(document.getElementById('capital').value);
+        const tasa = parseFloat(document.getElementById('tasa').value);
+        const n = parseInt(document.getElementById('n').value);
+        const tipoAmortizacion = document.getElementById('tipoAmortizacion').value;
+
+        // Validar campos
+        if (isNaN(capital) || isNaN(tasa) || isNaN(n)) {
+            alert('Por favor, completa todos los campos correctamente');
+            return;
+        }
+
+        // Mostrar mensaje temporal
+        resultValue.textContent = "—";
+        resultDetail.textContent = "La generación de la tabla de amortización estará disponible próximamente.";
+        resultBox.classList.remove('hidden');
+        
+        // Ocultar tabla por ahora
+        tablaAmortizacion.classList.add('hidden');
+    });
+</script>
+{% endblock %}

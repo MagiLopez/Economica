@@ -138,3 +138,27 @@ def anualidades():
 @app.route('/registro')
 def register():
     return render_template('registro.html')
+
+@app.route('/gradiente')
+def gradiente():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template('gradiente.html', username=session['username'])
+
+@app.route("/amortizacion")
+def amortizacion():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template("amortizacion.html")
+
+
+@app.route("/retorno")
+def retorno():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template("retorno.html")
+@app.route("/capitalizacion")
+def capitalizacion():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    return render_template("capitalizacion.html")

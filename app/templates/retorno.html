@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Tasa de Retorno{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-small">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="FINLY Logo" class="logo-small">
+        <h1>💹 Tasa de Retorno</h1>
+        <span class="user-info">{{ username }}</span>
+    </div>
+
+    <!-- Sección de Teoría Colapsable -->
+    <div class="teoria-section">
+        <button class="teoria-toggle" type="button" id="teoriaBtn">
+            <span id="teoriaIcon">▶</span> Teoría: ¿Qué es la Tasa de Retorno?
+        </button>
+        <div class="teoria-content" id="teoriaContent">
+            <h3>💡 Conceptos Básicos</h3>
+            <p>La <strong>Tasa de Retorno</strong> (también llamada Tasa Interna de Retorno - TIR) es la tasa de interés que hace que el valor presente neto (VPN) de todos los flujos de efectivo de una inversión sea igual a cero.  
+               Es una medida clave para evaluar la rentabilidad de un proyecto o inversión.</p>
+
+            <h4>Tipos de Análisis:</h4>
+            <div class="tipo-box">
+                <strong>🔹 TIR (Tasa Interna de Retorno):</strong> Tasa que iguala el VPN a cero.<br>
+                <strong>🔹 VPN (Valor Presente Neto):</strong> Diferencia entre el valor presente de ingresos y egresos.<br>
+                <strong>🔹 Período de Recuperación:</strong> Tiempo necesario para recuperar la inversión inicial.
+            </div>
+
+            <h4>Fórmulas Principales:</h4>
+            <div class="formula-box">
+                <strong>Valor Presente Neto (VPN):</strong><br>
+                VPN = Σ [Flujo_t / (1 + i)^t] - Inversión Inicial<br><br>
+
+                <strong>Tasa Interna de Retorno (TIR):</strong><br>
+                0 = Σ [Flujo_t / (1 + TIR)^t] - Inversión Inicial<br><br>
+
+                <strong>Criterio de Decisión:</strong><br>
+                • Si TIR > Tasa de descuento → Aceptar proyecto<br>
+                • Si TIR < Tasa de descuento → Rechazar proyecto<br>
+                • Si VPN > 0 → Proyecto rentable
+            </div>
+
+            <h4>Variables:</h4>
+            <ul>
+                <li><strong>Inversión Inicial:</strong> Capital invertido al inicio (flujo negativo)</li>
+                <li><strong>Flujos de Efectivo:</strong> Ingresos o egresos en cada período</li>
+                <li><strong>i (Tasa de descuento):</strong> Tasa mínima aceptable de retorno</li>
+                <li><strong>n (Períodos):</strong> Duración del proyecto</li>
+                <li><strong>TIR:</strong> Tasa que hace VPN = 0</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>Ingresa la inversión inicial y los flujos de efectivo por período para calcular la TIR y el VPN. El cálculo se realizará cuando esté disponible la conexión.</p>
+
+    <form id="tasaRetornoForm">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="inversionInicial">Inversión Inicial:</label>
+                <input type="number" id="inversionInicial" name="inversionInicial" step="0.01">
+                <small>Monto invertido (positivo)</small>
+            </div>
+
+            <div class="input-group">
+                <label for="tasaDescuento">Tasa de Descuento (%):</label>
+                <input type="number" id="tasaDescuento" name="tasaDescuento" step="0.01">
+                <small>Para cálculo del VPN</small>
+            </div>
+        </div>
+
+        <div class="input-group full-width">
+            <label for="numPeriodos">Número de Períodos:</label>
+            <input type="number" id="numPeriodos" name="numPeriodos" min="1" max="20">
+            <small>Cantidad de flujos de efectivo</small>
+        </div>
+
+        <button type="button" class="btn" id="generarFlujosBtn">➕ Generar Campos de Flujos</button>
+
+        <!-- Contenedor dinámico para flujos de efectivo -->
+        <div id="flujosContainer" class="flujos-container hidden">
+            <h4>💰 Flujos de Efectivo por Período</h4>
+            <div id="flujosInputs"></div>
+        </div>
+
+        <button type="button" class="btn hidden" id="calcularBtn">📊 Calcular TIR y VPN</button>
+    </form>
+
+    <div class="result-box hidden" id="resultBox">
+        <div class="result-content">
+            <h3>📈 Resultados del Análisis:</h3>
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label">TIR (Tasa Interna de Retorno):</span>
+                    <div class="result-value" id="tirValue">—</div>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">VPN (Valor Presente Neto):</span>
+                    <div class="result-value" id="vpnValue">—</div>
+                </div>
+            </div>
+            <div class="result-detail" id="resultDetail">Los resultados aparecerán aquí.</div>
+        </div>
+    </div>
+
+    <!-- Tabla de Flujos -->
+    <div class="tabla-flujos hidden" id="tablaFlujos">
+        <h3>📋 Análisis de Flujos de Efectivo</h3>
+        <div class="table-responsive">
+            <table id="tablaFlujosContent">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Flujo de Efectivo</th>
+                        <th>Flujo Descontado</th>
+                        <th>Flujo Acumulado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaFlujosBody">
+                    <!-- Las filas se generarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .flujos-container {
+        margin: 1.5rem 0;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+
+    .flujos-container h4 {
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+
+    #flujosInputs {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .flujo-input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .flujo-input-group label {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 0.3rem;
+        font-weight: 500;
+    }
+
+    .flujo-input-group input {
+        padding: 0.6rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+
+    .flujo-input-group input:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .result-item {
+        text-align: center;
+    }
+
+    .result-label {
+        display: block;
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .tabla-flujos {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .tabla-flujos h3 {
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .tabla-flujos table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .tabla-flujos th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .tabla-flujos td {
+        padding: 0.75rem;
+        text-align: right;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .tabla-flujos td:first-child {
+        text-align: center;
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .tabla-flujos tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .tabla-flujos tbody tr:last-child {
+        background: #f0f4ff;
+        font-weight: 600;
+    }
+</style>
+
+<script>
+    // Mostrar/ocultar la teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
+    });
+
+    // Generar campos de flujos dinámicamente
+    document.getElementById('generarFlujosBtn').addEventListener('click', function() {
+        const numPeriodos = parseInt(document.getElementById('numPeriodos').value);
+        
+        if (isNaN(numPeriodos) || numPeriodos < 1 || numPeriodos > 20) {
+            alert('Por favor, ingresa un número válido de períodos (1-20)');
+            return;
+        }
+
+        const flujosContainer = document.getElementById('flujosContainer');
+        const flujosInputs = document.getElementById('flujosInputs');
+        const calcularBtn = document.getElementById('calcularBtn');
+        
+        // Limpiar inputs anteriores
+        flujosInputs.innerHTML = '';
+        
+        // Generar inputs para cada período
+        for (let i = 1; i <= numPeriodos; i++) {
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'flujo-input-group';
+            inputGroup.innerHTML = `
+                <label for="flujo${i}">Período ${i}:</label>
+                <input type="number" id="flujo${i}" name="flujo${i}" step="0.01" placeholder="$0.00">
+            `;
+            flujosInputs.appendChild(inputGroup);
+        }
+        
+        // Mostrar contenedor y botón de calcular
+        flujosContainer.classList.remove('hidden');
+        calcularBtn.classList.remove('hidden');
+    });
+
+    // Botón de cálculo (sin conexión backend)
+    document.getElementById('calcularBtn').addEventListener('click', function() {
+        const resultBox = document.getElementById('resultBox');
+        const tirValue = document.getElementById('tirValue');
+        const vpnValue = document.getElementById('vpnValue');
+        const resultDetail = document.getElementById('resultDetail');
+        const tablaFlujos = document.getElementById('tablaFlujos');
+        
+        // Obtener valores
+        const inversionInicial = parseFloat(document.getElementById('inversionInicial').value);
+        const tasaDescuento = parseFloat(document.getElementById('tasaDescuento').value);
+        const numPeriodos = parseInt(document.getElementById('numPeriodos').value);
+        
+        // Validar campos principales
+        if (isNaN(inversionInicial) || isNaN(tasaDescuento)) {
+            alert('Por favor, completa la inversión inicial y la tasa de descuento');
+            return;
+        }
+
+        // Validar flujos
+        let flujosValidos = true;
+        for (let i = 1; i <= numPeriodos; i++) {
+            const flujo = document.getElementById(`flujo${i}`).value;
+            if (!flujo || isNaN(parseFloat(flujo))) {
+                flujosValidos = false;
+                break;
+            }
+        }
+
+        if (!flujosValidos) {
+            alert('Por favor, completa todos los flujos de efectivo');
+            return;
+        }
+
+        // Mostrar mensaje temporal
+        tirValue.textContent = "—";
+        vpnValue.textContent = "—";
+        resultDetail.textContent = "El cálculo de TIR y VPN estará disponible próximamente.";
+        resultBox.classList.remove('hidden');
+        
+        // Ocultar tabla por ahora
+        tablaFlujos.classList.add('hidden');
+    });
+</script>
+{% endblock %}
