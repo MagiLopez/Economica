@@ -5,6 +5,7 @@ from servicios.ServiciosIteresCompuesto import router as interes_compuesto_route
 from servicios.ServiciosTasaDeInteres import router as tasa_interes_router
 from servicios.ServiciosLogin import router as login_router
 from servicios.ServiciosAnualidad import router as anualidad_router
+from servicios.ServiciosCapitalizacion import router as capitalizacion_router
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -20,3 +21,4 @@ app.include_router(interes_compuesto_router)
 app.include_router(tasa_interes_router)
 app.include_router(login_router)
 app.include_router(anualidad_router)
+app.include_router(capitalizacion_router)

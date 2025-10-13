@@ -101,3 +101,67 @@ class Anualidad(BaseModel):
         self.va=self.A*(((1-(math.pow((1+(self.i/100)),-self.n)))/(self.i/100)))
         return self.va
     
+class Amortizacion(BaseModel):
+    p:float
+    i:float
+    n:opcional[float]=None
+    A:opcional[float]=None
+
+    def Amortizacion_Sistema_Frances(self):
+        self.A=self.p*((self.i/100)*math.pow((1+(self.i/100)),self.n))/(math.pow((1+(self.i/100)),self.n)-1)
+        return self.A
+
+    def Amortizacion_Sistema_Aleman(self):
+        amortizacion=self.p/self.n
+        intereses=self.p*(self.i/100)
+        cuota=amortizacion+intereses
+        return {round(cuota,2),round(amortizacion,2),round(intereses,2)}
+
+    def Amortizacion_Sistema_Americano(self):
+        intereses=self.p*(self.i/100)
+        return round(intereses,2)
+
+class Gradiente (BaseModel):
+    A:float
+    g:float #para el gradiente aritmetico es una cantidad fija
+    G:float #para el gradiente geometrico es %
+    i:float
+    n:float #numero de cuotas
+    vf:opcional[float]=None
+    va:opcional[float]=None
+
+    def Valor_futuro_gradiente_aritmetico(self):
+        self.vf=self.A*(((math.pow((1+(self.i/100)),self.n+1)-1)/(self.i/100)))+(self.g/self.i)*(((math.pow((1+(self.i/100)),self.n+1)-1)/(self.i/100))- (self.n*(1+self.i/100)))
+        return round(self.vf,2)
+    def Valor_actual_gradiente_aritmetico(self):
+        self.va=self.A*((((math.pow((1+(self.i/100)),self.n)-1))/(self.i/100)*math.pow((1+(self.i/100)),self.n))+(self.g/self.i/100)*(((math.pow((1+(self.i/100)),-self.n)-1))/(self.i/100)*math.pow((1+(self.i/100)),self.n)- (self.n/(math.pow((1+(self.i/100)),self.n)))))
+        return round(self.va,2)
+    
+    def Valor_presente_gradiente_geometrico(self):
+        if self.G == self.i:
+            self.va=self.A*(self.n/1+(self.i/100))
+            return round(self.vf,2)
+        else:
+            self.va=self.A*(((math.pow((1+(self.G/100)),self.n)- math.pow((1+(self.i/100)),self.n))/((self.i/100)-(self.g/100)*math.pow((1+(self.i/100)),self.n))))
+            return round(self.vf,2)
+    
+    def Valor_futuro_gradiente_geometrico(self):
+        if self.G == self.i:
+            self.vf=self.A*(self.n*(math.pow((1+(self.i/100)),self.n-1)))
+            return round(self.vf,2)
+        else:
+            self.vf=self.A*(((math.pow((1+(self.G/100)),self.n)- math.pow((1+(self.i/100)),self.n))/((self.i/100)-(self.g/100))))
+            return round(self.vf,2)
+
+class Capitalizacion(BaseModel):
+    c:float
+    i:float
+    n:float
+    Vf:opcional[float]=None
+
+    def capitalizacion_compuesta(self):
+        self.vf=self.c*math.pow((1+(self.i/100)),self.n)
+        return round(self.Vf,2)
+    def capitalizacion_simple(self):
+        self.vf=self.c*(1+(self.i/100)*self.n)
+        return round(self.Vf,2)
