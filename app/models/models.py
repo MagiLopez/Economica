@@ -118,8 +118,20 @@ class Amortizacion(BaseModel):
         return {round(cuota,2),round(amortizacion,2),round(intereses,2)}
 
     def Amortizacion_Sistema_Americano(self):
+        datos=[]
         intereses=self.p*(self.i/100)
-        return round(intereses,2)
+        for i in range (self.n):
+            if i==self.n-1:
+                pagos=intereses+self.p
+                            #numero de periodos/pagos/intereses/amortizacion/dinero inicial
+                datos.append(i,round(intereses,2),self.p,self.p)
+            else:
+                pagos=intereses+self.A
+                datos.append(i,pagos,round(intereses,2),0,self.p)
+        return datos
+
+            
+       
 
 class Gradiente (BaseModel):
     A:float
