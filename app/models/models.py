@@ -127,7 +127,7 @@ class Amortizacion(BaseModel):
                 datos.append(i+1,round(intereses,2),self.p,0)
             else:
                 pagos=intereses+self.A
-                datos.append(i,pagos,round(intereses,2),0,self.p)
+                datos.append(i+1,pagos,round(intereses,2),0,self.p)
         return datos
 
             

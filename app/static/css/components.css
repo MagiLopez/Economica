@@ -237,7 +237,7 @@
 
     .teoria-content {
         max-height: 0;
-        overflow: hidden;
+        overflow: auto;
         background: white;
         transition: max-height 0.4s ease, padding 0.4s ease;
         padding: 0 25px;
@@ -246,6 +246,7 @@
     .teoria-content.show {
         max-height: 1000px;
         padding: 25px;
+        
     }
 
     .teoria-content h3 {

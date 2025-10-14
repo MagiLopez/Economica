@@ -29,7 +29,8 @@
             <h4>Fórmulas Principales:</h4>
             <div class="formula-box">
                 <strong>Valor Presente (VP) — Gradiente Aritmético:</strong><br>
-                VP = A × [(1 + i)ⁿ - 1] / (i(1 + i)ⁿ) + G × [((1 + i)ⁿ - i×n - 1) / (i²(1 + i)ⁿ)]<br><br>
+                VP = A × [(1 + i)ⁿ - 1] / (i(1 + i)ⁿ) + G × [((1 + i)ⁿ - i×n - 1) / (i²(1 + i)ⁿ)]
+                <br><br>
 
                 <strong>Valor Futuro (VF) — Gradiente Aritmético:</strong><br>
                 VF = A × [(1 + i)ⁿ - 1] / i + G × [((1 + i)ⁿ - i×n - 1) / i²]
@@ -76,8 +77,8 @@
         <div class="input-group full-width">
             <label for="calcular">¿Qué deseas calcular?</label>
             <select id="calcular" name="calcular">
-                <option value="vf">Valor Futuro (VF)</option>
-                <option value="vp">Valor Presente (VP)</option>
+                <option value="vf">Gradiente Aritmético </option>
+                <option value="vp">Gradiente Geométrico </option>
             </select>
         </div>
 
@@ -94,23 +95,50 @@
 </div>
 
 <script>
-    // Mostrar/ocultar la teoría
-    document.getElementById('teoriaBtn').addEventListener('click', function() {
-        const content = document.getElementById('teoriaContent');
-        const icon = document.getElementById('teoriaIcon');
-        content.classList.toggle('show');
-        icon.classList.toggle('rotated');
-    });
+document.getElementById('calcularBtn').addEventListener('click', async function() {
+    const A = parseFloat(document.getElementById('A').value) || 0;
+    const G = parseFloat(document.getElementById('G').value) || 0;
+    const n = parseFloat(document.getElementById('n').value) || 0;
+    const i = parseFloat(document.getElementById('tasa').value) || 0;
+    const tipo = document.getElementById('calcular').value;
 
-    // Botón de cálculo (sin conexión backend)
-    document.getElementById('calcularBtn').addEventListener('click', function() {
-        const resultBox = document.getElementById('resultBox');
-        const resultValue = document.getElementById('resultValue');
-        const resultDetail = document.getElementById('resultDetail');
-        
-        resultValue.textContent = "—";
-        resultDetail.textContent = "El cálculo estará disponible próximamente.";
+    const resultBox = document.getElementById('resultBox');
+    const resultValue = document.getElementById('resultValue');
+    const resultDetail = document.getElementById('resultDetail');
+
+    // Armamos el cuerpo de la petición
+    const payload = {
+        A: A,
+        g: tipo === 'vf' ? G : 0,   // g = gradiente aritmético
+        G: tipo === 'vp' ? G : 0,   // G = gradiente geométrico
+        i: i,
+        n: n
+    };
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/calcular_Gradiente", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || "Error en el cálculo");
+        }
+
+        const data = await response.json();
+
+        // Mostrar resultados
         resultBox.classList.remove('hidden');
-    });
+        resultValue.textContent = `VP: ${Object.values(data)[1]} | VF: ${Object.values(data)[0]}`;
+        resultDetail.textContent = JSON.stringify(data, null, 2);
+    } catch (error) {
+        resultBox.classList.remove('hidden');
+        resultValue.textContent = "⚠️ Error";
+        resultDetail.textContent = error.message;
+    }
+});
 </script>
+
 {% endblock %}

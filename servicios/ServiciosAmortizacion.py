@@ -12,7 +12,7 @@ def calcular_Amortizacion_sistema_frances(data:Amortizacion):
             raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/calcular_Amortizacion_Sistema_Americano")
-def calcular_Amortizacion_sistema_aleman(data:Amortizacion):
+def calcular_Amortizacion_sistema_americano(data:Amortizacion):
         datos=[]
         try:
             datos = data.Amortizacion_Sistema_Americano()
