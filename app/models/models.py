@@ -104,7 +104,7 @@ class Anualidad(BaseModel):
 class Amortizacion(BaseModel):
     p:float
     i:float
-    n:opcional[float]=None
+    n:opcional[int]=None
     A:opcional[float]=None
 
     def Amortizacion_Sistema_Frances(self):
@@ -118,16 +118,29 @@ class Amortizacion(BaseModel):
         return {round(cuota,2),round(amortizacion,2),round(intereses,2)}
 
     def Amortizacion_Sistema_Americano(self):
-        datos=[]
-        intereses=self.p*(self.i/100)
-        for i in range (self.n):
-            if i==self.n-1:
-                pagos=intereses+self.p
-                            #numero de periodos/pagos/intereses/amortizacion/dinero inicial
-                datos.append(i+1,round(intereses,2),self.p,0)
+
+        datos = []
+        intereses = self.p * (self.i / 100)
+
+        for periodo in range(1, self.n + 1):
+            if periodo == self.n:
+                amortizacion = self.p
+                pago = intereses + amortizacion
+                saldo = 0
             else:
-                pagos=intereses+self.A
-                datos.append(i+1,pagos,round(intereses,2),0,self.p)
+                amortizacion = 0
+                pago = intereses
+                saldo = self.p
+
+            # Añadimos una fila completa
+            datos.append([
+                periodo,
+                round(pago, 2),
+                round(intereses, 2),
+                round(amortizacion, 2),
+                round(saldo, 2)
+            ])
+
         return datos
 
             
