@@ -93,19 +93,19 @@
         </div>
     </div>
 
-    <p>Completa los campos requeridos para generar la tabla de amortización. El cálculo se realizará cuando esté disponible la conexión.</p>
+    <p>Completa los campos requeridos para generar la tabla de amortización.</p>
 
     <form id="amortizacionForm">
         <div class="input-row">
             <div class="input-group">
                 <label for="capital">Capital (P):</label>
-                <input type="number" id="capital" name="capital" step="0.01">
+                <input type="number" id="capital" name="capital" step="0.01" placeholder="10000">
                 <small>Monto del préstamo</small>
             </div>
 
             <div class="input-group">
                 <label for="tasa">Tasa de interés (i):</label>
-                <input type="number" id="tasa" name="tasa" step="0.01">
+                <input type="number" id="tasa" name="tasa" step="0.01" placeholder="5">
                 <small>Por período (%)</small>
             </div>
         </div>
@@ -113,15 +113,15 @@
         <div class="input-row">
             <div class="input-group">
                 <label for="n">Número de períodos (n):</label>
-                <input type="number" id="n" name="n">
+                <input type="number" id="n" name="n" placeholder="12">
                 <small>Cantidad de cuotas</small>
             </div>
 
             <div class="input-group full-width">
                 <label for="tipoAmortizacion">Sistema de Amortización:</label>
                 <select id="tipoAmortizacion" name="tipoAmortizacion">
-                    <option value="frances">Sistema Francés </option>
-                    <option value="aleman">Sistema Alemán </option>
+                    <option value="frances">Sistema Francés</option>
+                    <option value="aleman">Sistema Alemán</option>
                     <option value="americano">Sistema Americano</option>
                 </select>
             </div>
@@ -138,30 +138,44 @@
         </div>
     </div>
     
-    <!-- Tabla de Amortización -->
-    <!-- TABLA AGREGADA AQUÍ -->
-<div class="tabla-container" id="tablaContainer" style="margin-top: 20px;">
-    <table id="tablaAmortizacion" style="width: 100%; border-collapse: collapse;">
-        <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <tr>
-                <th style="padding: 12px; text-align: right;">Período</th>
-                <th style="padding: 12px; text-align: right;">Cuota</th>
-                <th style="padding: 12px; text-align: right;">Interés</th>
-                <th style="padding: 12px; text-align: right;">Amortización</th>
-                <th style="padding: 12px; text-align: right;">Saldo</th>
-            </tr>
-        </thead>
-        <tbody id="tablaBody">
-        </tbody>
-    </table>
-</div>
-
-
-
+    <!-- Tabla de Amortización (FUERA del result-box) -->
+    <div class="tabla-container hidden" id="tablaContainer" style="margin-top: 20px;">
+        <table id="tablaAmortizacion" style="width: 100%; border-collapse: collapse;">
+            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <tr>
+                    <th style="padding: 12px; text-align: center;">Período</th>
+                    <th style="padding: 12px; text-align: center;">Cuota</th>
+                    <th style="padding: 12px; text-align: center;">Interés</th>
+                    <th style="padding: 12px; text-align: center;">Amortización</th>
+                    <th style="padding: 12px; text-align: center;">Saldo</th>
+                </tr>
+            </thead>
+            <tbody id="tablaBody">
+            </tbody>
+        </table>
+    </div>
 
 </div>
 
+<style>
+    #tablaAmortizacion th, 
+    #tablaAmortizacion td {
+        text-align: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
 
+
+    #tablaTotal {
+        font-weight: bold;
+        background: #e8eefc;
+    }
+
+    #tablaTotal td {
+        border-top: 2px solid #667eea;
+        border-bottom: none; /* Sin línea inferior en totales */
+    }
+</style>
 
 <script>
     // Mostrar/ocultar teoría
@@ -172,12 +186,22 @@
         icon.classList.toggle('rotated');
     });
 
+    // Formatear números como moneda
+    function formatCurrency(valor) {
+        return new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            minimumFractionDigits: 2
+        }).format(valor);
+    }
+
     // Conexión con el backend FastAPI
     document.getElementById('calcularBtn').addEventListener('click', async function() {
         const resultBox = document.getElementById('resultBox');
         const resultValue = document.getElementById('resultValue');
         const resultDetail = document.getElementById('resultDetail');
-        const tablaAmortizacion = document.getElementById('tablaAmortizacion');
+        const tablaContainer = document.getElementById('tablaContainer');
+        const tablaBody = document.getElementById('tablaBody');
 
         // Obtener valores del formulario
         const capital = parseFloat(document.getElementById('capital').value);
@@ -191,15 +215,33 @@
             return;
         }
 
-        // Solo ejecutar si es Sistema Americano
-        if (tipoAmortizacion !== "americano") {
-            alert("Selecciona el sistema americano para esta prueba.");
+        if (capital <= 0 || tasa <= 0 || n <= 0) {
+            alert('Los valores deben ser mayores a cero');
             return;
+        }
+
+        // Determinar endpoint según el tipo de amortización
+        let endpoint = '';
+        let tipoNombre = '';
+        
+        switch(tipoAmortizacion) {
+            case 'frances':
+                endpoint = 'http://127.0.0.1:5000/calcular_Amortizacion';
+                tipoNombre = 'Sistema Francés';
+                break;
+            case 'aleman':
+                endpoint = 'http://127.0.0.1:5000/calcular_Amortizacion_Sistema_Aleman';
+                tipoNombre = 'Sistema Alemán';
+                break;
+            case 'americano':
+                endpoint = 'http://127.0.0.1:5000/calcular_Amortizacion_Sistema_Americano';
+                tipoNombre = 'Sistema Americano';
+                break;
         }
 
         try {
             // Enviar los datos al backend
-            const response = await fetch("http://127.0.0.1:8000/calcular_Amortizacion_Sistema_Americano", {
+            const response = await fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -215,36 +257,126 @@
 
             // Mostrar resultados
             resultBox.classList.remove('hidden');
-            resultValue.textContent = "Cálculo completado con éxito";
-            resultDetail.textContent = "Tabla de amortización generada:";
-
+            resultValue.textContent = tipoNombre;
+            
             // Limpiar tabla anterior
-            tablaAmortizacion.innerHTML = `
-                <tr>
-                    <th>Periodo</th>
-                    <th>Interés</th>
-                    <th>Amortización</th>
-                    <th>Saldo</th>
-                </tr>
-            `;
+            tablaBody.innerHTML = '';
 
-            // Rellenar tabla con los datos del backend
-            data.tabla.forEach(fila => {
-                const tr = document.createElement("tr");
-                fila.forEach(valor => {
-                    const td = document.createElement("td");
-                    td.textContent = valor;
-                    tr.appendChild(td);
+            // Procesar según el tipo de sistema
+            if (tipoAmortizacion === 'frances') {
+                // Sistema Francés: solo retorna la cuota
+                const cuota = data["Cuota de Amortizacion"];
+                
+                resultDetail.innerHTML = `
+                    <strong>Capital:</strong> ${formatCurrency(capital)}<br>
+                    <strong>Tasa:</strong> ${tasa}% por período<br>
+                    <strong>Períodos:</strong> ${n}<br>
+                    <strong>Cuota Fija:</strong> ${formatCurrency(cuota)}
+                `;
+
+                // Generar tabla manualmente para el sistema francés
+                let saldo = capital;
+                let totalCuota = 0;
+                let totalInteres = 0;
+                let totalAmortizacion = 0;
+
+                for (let i = 1; i <= n; i++) {
+                    const interes = saldo * (tasa / 100);
+                    const amortizacion = cuota - interes;
+                    saldo -= amortizacion;
+                    
+                    if (saldo < 0.01) saldo = 0;
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="text-align: center;">${i}</td>
+                        <td style="text-align: center;">${formatCurrency(cuota)}</td>
+                        <td style="text-align: center;">${formatCurrency(interes)}</td>
+                        <td style="text-align: center;">${formatCurrency(amortizacion)}</td>
+                        <td style="text-align: center;">${formatCurrency(saldo)}</td>
+                    `;
+                    tablaBody.appendChild(tr);
+
+                    totalCuota += cuota;
+                    totalInteres += interes;
+                    totalAmortizacion += amortizacion;
+                }
+
+                // Fila de totales
+                const totalRow = document.createElement("tr");
+                totalRow.id = "tablaTotal";
+                totalRow.innerHTML = `
+                    <td style="text-align: center;"><strong>TOTALES</strong></td>
+                    <td style="text-align: center;"><strong>${formatCurrency(totalCuota)}</strong></td>
+                    <td style="text-align: center;"><strong>${formatCurrency(totalInteres)}</strong></td>
+                    <td style="text-align: center;"><strong>${formatCurrency(totalAmortizacion)}</strong></td>
+                    <td style="text-align: center;"><strong>—</strong></td>
+                `;
+                tablaBody.appendChild(totalRow);
+
+                tablaContainer.classList.remove('hidden');
+
+            } else if (tipoAmortizacion === 'aleman' || tipoAmortizacion === 'americano') {
+                // Sistema Alemán y Americano: retornan tabla completa
+                const tabla = tipoAmortizacion === 'americano' ? data.tabla : data;
+                
+                resultDetail.innerHTML = `
+                    <strong>Capital:</strong> ${formatCurrency(capital)}<br>
+                    <strong>Tasa:</strong> ${tasa}% por período<br>
+                    <strong>Períodos:</strong> ${n}
+                `;
+
+                // Variables para totales
+                let totalCuota = 0;
+                let totalInteres = 0;
+                let totalAmortizacion = 0;
+
+                // Rellenar tabla con los datos del backend
+                tabla.forEach((fila, index) => {
+                    const tr = document.createElement("tr");
+                    
+                    const periodo = fila[0];
+                    const cuota = parseFloat(fila[1]) || 0;
+                    const interes = parseFloat(fila[2]) || 0;
+                    const amortizacion = parseFloat(fila[3]) || 0;
+                    const saldo = parseFloat(fila[4]) || 0;
+
+                    tr.innerHTML = `
+                        <td style="text-align: center;">${periodo}</td>
+                        <td style="text-align: center;">${formatCurrency(cuota)}</td>
+                        <td style="text-align: center;">${formatCurrency(interes)}</td>
+                        <td style="text-align: center;">${formatCurrency(amortizacion)}</td>
+                        <td style="text-align: center;">${formatCurrency(saldo)}</td>
+                    `;
+                    
+                    tablaBody.appendChild(tr);
+
+                    // Acumular totales
+                    totalCuota += cuota;
+                    totalInteres += interes;
+                    totalAmortizacion += amortizacion;
                 });
-                tablaAmortizacion.appendChild(tr);
-            });
+
+                // Fila de totales
+                const totalRow = document.createElement("tr");
+                totalRow.id = "tablaTotal";
+                totalRow.innerHTML = `
+                    <td style="text-align: center;"><strong>TOTALES</strong></td>
+                    <td style="text-align: center;"><strong>${formatCurrency(totalCuota)}</strong></td>
+                    <td style="text-align: center;"><strong>${formatCurrency(totalInteres)}</strong></td>
+                    <td style="text-align: center;"><strong>${formatCurrency(totalAmortizacion)}</strong></td>
+                    <td style="text-align: center;"><strong>—</strong></td>
+                `;
+                tablaBody.appendChild(totalRow);
+
+                tablaContainer.classList.remove('hidden');
+            }
 
         } catch (error) {
             console.error("Error:", error);
-            alert("Ocurrió un error al conectar con el servidor");
+            alert("Ocurrió un error al conectar con el servidor: " + error.message);
         }
     });
 </script>
-
-
+ 
 {% endblock %}
