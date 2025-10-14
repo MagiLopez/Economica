@@ -124,7 +124,7 @@ class Amortizacion(BaseModel):
             if i==self.n-1:
                 pagos=intereses+self.p
                             #numero de periodos/pagos/intereses/amortizacion/dinero inicial
-                datos.append(i,round(intereses,2),self.p,self.p)
+                datos.append(i,round(intereses,2),self.p,0)
             else:
                 pagos=intereses+self.A
                 datos.append(i,pagos,round(intereses,2),0,self.p)

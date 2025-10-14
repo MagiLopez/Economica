@@ -13,17 +13,19 @@ def calcular_Amortizacion_sistema_frances(data:Amortizacion):
 
 @router.post("/calcular_Amortizacion_Sistema_Americano")
 def calcular_Amortizacion_sistema_aleman(data:Amortizacion):
+        datos=[]
         try:
-            i=data.Amortizacion_Sistema_Americano()
-            return {"interes":i}
+            datos = data.Amortizacion_Sistema_Americano()
+            return datos
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/calcular_Amortizacion_Sistema_Aleman")
 def calcular_Amortizacion_sistema_aleman(data:Amortizacion):
-        A=[0,0,0]
+        datos=[]
         try:
-            A[0,0,0,]=data.Amortizacion_Sistema_Aleman()
-            return {"Cuota":A[0],"Amortizacion":A[1],"Interes":A[2]}
+            datos = data.Amortizacion_Sistema_Aleman()
+            return datos
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
