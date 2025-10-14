@@ -16,7 +16,7 @@ def calcular_Amortizacion_sistema_aleman(data:Amortizacion):
         datos=[]
         try:
             datos = data.Amortizacion_Sistema_Americano()
-            return datos
+            return {"tabla":datos}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
