@@ -108,14 +108,39 @@ class Amortizacion(BaseModel):
     A:opcional[float]=None
 
     def Amortizacion_Sistema_Frances(self):
-        self.A=self.p*((self.i/100)*math.pow((1+(self.i/100)),self.n))/(math.pow((1+(self.i/100)),self.n)-1)
-        return self.A
-
+        datos=[]
+        
+        for periodo in range(0,self.n+1):
+            if periodo==0:
+                saldo=self.p
+                intereses=0
+                pago=0
+                amortizacion=0
+            else:
+                pago= self.p*(self.i/100)/(1-math.pow((1+(self.i/100)),-self.n))
+                intereses=saldo*(self.i/100)
+                amortizacion=pago-intereses
+                saldo-=amortizacion
+            # Añadimos una fila completa
+            datos.append([periodo, round(pago, 2), round(intereses, 2), round(amortizacion, 2), round(saldo, 2)])
+        return datos
+    
     def Amortizacion_Sistema_Aleman(self):
-        amortizacion=self.p/self.n
-        intereses=self.p*(self.i/100)
-        cuota=amortizacion+intereses
-        return {round(cuota,2),round(amortizacion,2),round(intereses,2)}
+        datos=[]
+        for periodo in range(0, self.n + 1):
+            if periodo==0:
+                saldo = self.p
+                intereses = 0
+                pago = 0
+                amortizacion = 0
+            else:
+                intereses = saldo * (self.i / 100)
+                amortizacion = self.p/self.n
+                pago = intereses + amortizacion
+                saldo -= amortizacion
+            # Añadimos una fila completa
+            datos.append([periodo, round(pago, 2), round(intereses, 2), round(amortizacion, 2), round(saldo, 2)])
+        return datos
 
     def Amortizacion_Sistema_Americano(self):
 

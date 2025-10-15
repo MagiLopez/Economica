@@ -5,9 +5,10 @@ router=APIRouter()
 
 @router.post("/calcular_Amortizacion")
 def calcular_Amortizacion_sistema_frances(data:Amortizacion):
+        datos=[]
         try:
-            A=data.Amortizacion_Sistema_Frances()
-            return {"Cuota de Amortizacion":A}
+            datos=data.Amortizacion_Sistema_Frances()
+            return {"tabla":datos}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -25,7 +26,7 @@ def calcular_Amortizacion_sistema_aleman(data:Amortizacion):
         datos=[]
         try:
             datos = data.Amortizacion_Sistema_Aleman()
-            return datos
+            return {"tabla":datos}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
