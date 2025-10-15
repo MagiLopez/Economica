@@ -105,7 +105,7 @@ class Amortizacion(BaseModel):
     p:float
     i:float
     n:opcional[int]=None
-    A:opcional[float]=None
+    
 
     def Amortizacion_Sistema_Frances(self):
         datos=[]
@@ -215,3 +215,20 @@ class Capitalizacion(BaseModel):
     def capitalizacion_simple(self):
         self.vf=self.c*(1+(self.i/100)*self.n)
         return round(self.Vf,2)
+
+class Tasa_Interna_De_Retorno(BaseModel):
+    flujo_de_caja:list
+    tasa:opcional[float]=None
+
+    def calcular_tasa_interna_de_retorno(self):
+        tir=0.0
+        for i in range(0,100000):
+            npv=0.0
+            for t, flujo in enumerate(self.flujo_de_caja):
+                npv += flujo / ((1 + tir) ** t)
+            if npv > 0:
+                tir += 0.001
+            else:
+                break
+        self.tasa=tir*100
+        return round(self.tasa,2)

@@ -8,6 +8,9 @@ from servicios.ServiciosAnualidad import router as anualidad_router
 from servicios.ServiciosCapitalizacion import router as capitalizacion_router
 from servicios.ServiciosAmortizacion import router as Amortizacion_router
 from servicios.ServiciosGradiente import router as gradiente_router
+from servicios.ServiciosTIR import router as TIR_router
+
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -26,3 +29,4 @@ app.include_router(anualidad_router)
 app.include_router(capitalizacion_router)
 app.include_router(Amortizacion_router)
 app.include_router(gradiente_router)
+app.include_router(TIR_router)
