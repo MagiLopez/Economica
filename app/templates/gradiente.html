@@ -106,17 +106,28 @@ document.getElementById('calcularBtn').addEventListener('click', async function(
     const resultValue = document.getElementById('resultValue');
     const resultDetail = document.getElementById('resultDetail');
 
-    // Armamos el cuerpo de la petición
-    const payload = {
+    // Determinar endpoint y payload según el tipo
+    let endpoint = "";
+    let payload = {
         A: A,
-        g: tipo === 'vf' ? G : 0,   // g = gradiente aritmético
-        G: tipo === 'vp' ? G : 0,   // G = gradiente geométrico
         i: i,
-        n: n
+        n: n,
+        g: 0,
+        G: 0
     };
 
+    if (tipo === 'vf') {
+        // Gradiente Aritmético
+        endpoint = "http://127.0.0.1:5000/calcular_Gradiente_aritmetico";
+        payload.g = G;
+    } else {
+        // Gradiente Geométrico
+        endpoint = "http://127.0.0.1:5000/calcular_Gradiente_geometrico";
+        payload.G = G;
+    }
+
     try {
-        const response = await fetch("http://127.0.0.1:5000/calcular_Gradiente", {
+        const response = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -131,8 +142,15 @@ document.getElementById('calcularBtn').addEventListener('click', async function(
 
         // Mostrar resultados
         resultBox.classList.remove('hidden');
-        resultValue.textContent = `VP: ${Object.values(data)[1]} | VF: ${Object.values(data)[0]}`;
-        resultDetail.textContent = JSON.stringify(data, null, 2);
+        
+        if (tipo === 'vf') {
+            resultValue.textContent = `Valor Futuro: ${data["Valor Futuro Gradiente Aritmetico"]}`;
+            resultDetail.textContent = `Valor Actual: ${data["Valor Actual Gradiente Aritmetico"]}`;
+        } else {
+            resultValue.textContent = `Valor Futuro: ${data["Valor Futuro Gradiente Geometrico"]}`;
+            resultDetail.textContent = `Valor Actual: ${data["Valor Actual Gradiente Geometrico"]}`;
+        }
+        
     } catch (error) {
         resultBox.classList.remove('hidden');
         resultValue.textContent = "⚠️ Error";

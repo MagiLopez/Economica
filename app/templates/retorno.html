@@ -279,48 +279,58 @@
         calcularBtn.classList.remove('hidden');
     });
 
-    // Botón de cálculo (sin conexión backend)
-    document.getElementById('calcularBtn').addEventListener('click', function() {
-        const resultBox = document.getElementById('resultBox');
-        const tirValue = document.getElementById('tirValue');
-        const vpnValue = document.getElementById('vpnValue');
-        const resultDetail = document.getElementById('resultDetail');
-        const tablaFlujos = document.getElementById('tablaFlujos');
-        
-        // Obtener valores
+    // ✅ Conexión con el backend FastAPI
+    document.getElementById('calcularBtn').addEventListener('click', async function() {
         const inversionInicial = parseFloat(document.getElementById('inversionInicial').value);
-        const tasaDescuento = parseFloat(document.getElementById('tasaDescuento').value);
         const numPeriodos = parseInt(document.getElementById('numPeriodos').value);
-        
-        // Validar campos principales
-        if (isNaN(inversionInicial) || isNaN(tasaDescuento)) {
-            alert('Por favor, completa la inversión inicial y la tasa de descuento');
+
+        // Validar campos
+        if (isNaN(inversionInicial) || isNaN(numPeriodos) || numPeriodos < 1) {
+            alert('Por favor, ingresa todos los valores correctamente');
             return;
         }
 
-        // Validar flujos
-        let flujosValidos = true;
+        // Obtener flujos de efectivo
+        let flujos = [-inversionInicial]; // inversión inicial negativa
         for (let i = 1; i <= numPeriodos; i++) {
-            const flujo = document.getElementById(`flujo${i}`).value;
-            if (!flujo || isNaN(parseFloat(flujo))) {
-                flujosValidos = false;
-                break;
+            const flujo = parseFloat(document.getElementById(`flujo${i}`).value);
+            if (isNaN(flujo)) {
+                alert(`Por favor, ingresa un valor válido para el período ${i}`);
+                return;
             }
+            flujos.push(flujo);
         }
 
-        if (!flujosValidos) {
-            alert('Por favor, completa todos los flujos de efectivo');
-            return;
-        }
+        // Enviar datos al backend
+        try {
+            const response = await fetch("http://127.0.0.1:5000/calcular_TIR", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ flujo_de_caja: flujos })
+            });
 
-        // Mostrar mensaje temporal
-        tirValue.textContent = "—";
-        vpnValue.textContent = "—";
-        resultDetail.textContent = "El cálculo de TIR y VPN estará disponible próximamente.";
-        resultBox.classList.remove('hidden');
-        
-        // Ocultar tabla por ahora
-        tablaFlujos.classList.add('hidden');
+            if (!response.ok) {
+                throw new Error("Error al calcular la TIR");
+            }
+
+            const data = await response.json();
+
+            // Mostrar resultado
+            const resultBox = document.getElementById('resultBox');
+            const tirValue = document.getElementById('tirValue');
+            tirValue.textContent = data.TIR + " %";
+
+            resultBox.classList.remove('hidden');
+            document.getElementById('resultDetail').textContent = "Cálculo exitoso desde el backend.";
+
+        } catch (error) {
+            alert("Hubo un problema con la conexión al servidor: " + error.message);
+        }
     });
 </script>
+
+
+
 {% endblock %}

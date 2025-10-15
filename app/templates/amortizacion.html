@@ -263,114 +263,61 @@
             tablaBody.innerHTML = '';
 
             // Procesar según el tipo de sistema
-            if (tipoAmortizacion === 'frances') {
-                // Sistema Francés: solo retorna la cuota
-                const cuota = data["Cuota de Amortizacion"];
+            // Obtener la tabla según el tipo de sistema
+            const tabla = data.tabla || data;
+            
+            resultDetail.innerHTML = `
+                <strong>Capital:</strong> ${formatCurrency(capital)}<br>
+                <strong>Tasa:</strong> ${tasa}% por período<br>
+                <strong>Períodos:</strong> ${n}
+            `;
+
+            // Variables para totales
+            let totalCuota = 0;
+            let totalInteres = 0;
+            let totalAmortizacion = 0;
+
+            // Rellenar tabla con los datos del backend (todos los sistemas)
+            tabla.forEach((fila) => {
+                const periodo = fila[0];
+                const cuota = parseFloat(fila[1]) || 0;
+                const interes = parseFloat(fila[2]) || 0;
+                const amortizacion = parseFloat(fila[3]) || 0;
+                const saldo = parseFloat(fila[4]) || 0;
+
+                // Saltar el período 0 si existe
+                if (periodo === 0) return;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="text-align: center;">${periodo}</td>
+                    <td style="text-align: center;">${formatCurrency(cuota)}</td>
+                    <td style="text-align: center;">${formatCurrency(interes)}</td>
+                    <td style="text-align: center;">${formatCurrency(amortizacion)}</td>
+                    <td style="text-align: center;">${formatCurrency(saldo)}</td>
+                `;
                 
-                resultDetail.innerHTML = `
-                    <strong>Capital:</strong> ${formatCurrency(capital)}<br>
-                    <strong>Tasa:</strong> ${tasa}% por período<br>
-                    <strong>Períodos:</strong> ${n}<br>
-                    <strong>Cuota Fija:</strong> ${formatCurrency(cuota)}
-                `;
+                tablaBody.appendChild(tr);
 
-                // Generar tabla manualmente para el sistema francés
-                let saldo = capital;
-                let totalCuota = 0;
-                let totalInteres = 0;
-                let totalAmortizacion = 0;
+                // Acumular totales
+                totalCuota += cuota;
+                totalInteres += interes;
+                totalAmortizacion += amortizacion;
+            });
 
-                for (let i = 1; i <= n; i++) {
-                    const interes = saldo * (tasa / 100);
-                    const amortizacion = cuota - interes;
-                    saldo -= amortizacion;
-                    
-                    if (saldo < 0.01) saldo = 0;
+            // Fila de totales
+            const totalRow = document.createElement("tr");
+            totalRow.id = "tablaTotal";
+            totalRow.innerHTML = `
+                <td style="text-align: center;"><strong>TOTALES</strong></td>
+                <td style="text-align: center;"><strong>${formatCurrency(totalCuota)}</strong></td>
+                <td style="text-align: center;"><strong>${formatCurrency(totalInteres)}</strong></td>
+                <td style="text-align: center;"><strong>${formatCurrency(totalAmortizacion)}</strong></td>
+                <td style="text-align: center;"><strong>—</strong></td>
+            `;
+            tablaBody.appendChild(totalRow);
 
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td style="text-align: center;">${i}</td>
-                        <td style="text-align: center;">${formatCurrency(cuota)}</td>
-                        <td style="text-align: center;">${formatCurrency(interes)}</td>
-                        <td style="text-align: center;">${formatCurrency(amortizacion)}</td>
-                        <td style="text-align: center;">${formatCurrency(saldo)}</td>
-                    `;
-                    tablaBody.appendChild(tr);
-
-                    totalCuota += cuota;
-                    totalInteres += interes;
-                    totalAmortizacion += amortizacion;
-                }
-
-                // Fila de totales
-                const totalRow = document.createElement("tr");
-                totalRow.id = "tablaTotal";
-                totalRow.innerHTML = `
-                    <td style="text-align: center;"><strong>TOTALES</strong></td>
-                    <td style="text-align: center;"><strong>${formatCurrency(totalCuota)}</strong></td>
-                    <td style="text-align: center;"><strong>${formatCurrency(totalInteres)}</strong></td>
-                    <td style="text-align: center;"><strong>${formatCurrency(totalAmortizacion)}</strong></td>
-                    <td style="text-align: center;"><strong>—</strong></td>
-                `;
-                tablaBody.appendChild(totalRow);
-
-                tablaContainer.classList.remove('hidden');
-
-            } else if (tipoAmortizacion === 'aleman' || tipoAmortizacion === 'americano') {
-                // Sistema Alemán y Americano: retornan tabla completa
-                const tabla = tipoAmortizacion === 'americano' ? data.tabla : data;
-                
-                resultDetail.innerHTML = `
-                    <strong>Capital:</strong> ${formatCurrency(capital)}<br>
-                    <strong>Tasa:</strong> ${tasa}% por período<br>
-                    <strong>Períodos:</strong> ${n}
-                `;
-
-                // Variables para totales
-                let totalCuota = 0;
-                let totalInteres = 0;
-                let totalAmortizacion = 0;
-
-                // Rellenar tabla con los datos del backend
-                tabla.forEach((fila, index) => {
-                    const tr = document.createElement("tr");
-                    
-                    const periodo = fila[0];
-                    const cuota = parseFloat(fila[1]) || 0;
-                    const interes = parseFloat(fila[2]) || 0;
-                    const amortizacion = parseFloat(fila[3]) || 0;
-                    const saldo = parseFloat(fila[4]) || 0;
-
-                    tr.innerHTML = `
-                        <td style="text-align: center;">${periodo}</td>
-                        <td style="text-align: center;">${formatCurrency(cuota)}</td>
-                        <td style="text-align: center;">${formatCurrency(interes)}</td>
-                        <td style="text-align: center;">${formatCurrency(amortizacion)}</td>
-                        <td style="text-align: center;">${formatCurrency(saldo)}</td>
-                    `;
-                    
-                    tablaBody.appendChild(tr);
-
-                    // Acumular totales
-                    totalCuota += cuota;
-                    totalInteres += interes;
-                    totalAmortizacion += amortizacion;
-                });
-
-                // Fila de totales
-                const totalRow = document.createElement("tr");
-                totalRow.id = "tablaTotal";
-                totalRow.innerHTML = `
-                    <td style="text-align: center;"><strong>TOTALES</strong></td>
-                    <td style="text-align: center;"><strong>${formatCurrency(totalCuota)}</strong></td>
-                    <td style="text-align: center;"><strong>${formatCurrency(totalInteres)}</strong></td>
-                    <td style="text-align: center;"><strong>${formatCurrency(totalAmortizacion)}</strong></td>
-                    <td style="text-align: center;"><strong>—</strong></td>
-                `;
-                tablaBody.appendChild(totalRow);
-
-                tablaContainer.classList.remove('hidden');
-            }
+            tablaContainer.classList.remove('hidden');
 
         } catch (error) {
             console.error("Error:", error);
