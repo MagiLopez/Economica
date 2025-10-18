@@ -35,10 +35,6 @@
                 <strong>Interés Compuesto:</strong><br>
                 VF = P × (1 + i)ⁿ<br><br>
 
-                <strong>Capitalización con Frecuencia:</strong><br>
-                VF = P × (1 + i/m)^(m×n)<br>
-                <small>donde m = número de capitalizaciones por período</small><br><br>
-
                 <strong>Capitalización Continua:</strong><br>
                 VF = P × e^(i×n)<br>
                 <small>donde e ≈ 2.71828</small>
@@ -93,8 +89,6 @@
                 <select id="tipoCapitalizacion" name="tipoCapitalizacion">
                     <option value="simple">Interés Simple</option>
                     <option value="compuesto">Interés Compuesto</option>
-                    <option value="frecuencia">Con Frecuencia Específica</option>
-                    <option value="continua">Capitalización Continua</option>
                 </select>
             </div>
         </div>
@@ -144,7 +138,8 @@
 
 
 <script>
-    // Mostrar/ocultar la teoría
+// Toggle de la sección de teoría
+// Mostrar/ocultar teoría
     document.getElementById('teoriaBtn').addEventListener('click', function() {
         const content = document.getElementById('teoriaContent');
         const icon = document.getElementById('teoriaIcon');
@@ -152,59 +147,87 @@
         icon.classList.toggle('rotated');
     });
 
-    // Mostrar/ocultar campo de frecuencia según el tipo seleccionado
-    document.getElementById('tipoCapitalizacion').addEventListener('change', function() {
-        const frecuenciaRow = document.getElementById('frecuenciaRow');
-        
-        if (this.value === 'frecuencia') {
-            frecuenciaRow.classList.remove('hidden');
-        } else {
-            frecuenciaRow.classList.add('hidden');
-        }
-    });
+// Mostrar/ocultar frecuencia según tipo de capitalización
+document.getElementById('tipoCapitalizacion').addEventListener('change', function() {
+    const frecuenciaRow = document.getElementById('frecuenciaRow');
+    if (this.value === 'compuesto') {
+        frecuenciaRow.classList.remove('hidden');
+    } else {
+        frecuenciaRow.classList.add('hidden');
+    }
+});
 
-    // Botón de cálculo (sin conexión backend)
-    document.getElementById('calcularBtn').addEventListener('click', function() {
-        const resultBox = document.getElementById('resultBox');
-        const resultValue = document.getElementById('resultValue');
-        const resultDetail = document.getElementById('resultDetail');
-        const resultBreakdown = document.getElementById('resultBreakdown');
-        const comparativaSection = document.getElementById('comparativaSection');
-        
-        // Obtener valores
-        const capitalInicial = parseFloat(document.getElementById('capitalInicial').value);
-        const tasa = parseFloat(document.getElementById('tasa').value);
-        const tiempo = parseFloat(document.getElementById('tiempo').value);
-        const tipoCapitalizacion = document.getElementById('tipoCapitalizacion').value;
-        
-        // Validar campos
-        if (isNaN(capitalInicial) || isNaN(tasa) || isNaN(tiempo)) {
-            alert('Por favor, completa todos los campos correctamente');
-            return;
+// Función para calcular capitalización
+document.getElementById('calcularBtn').addEventListener('click', async function() {
+    const capitalInicial = parseFloat(document.getElementById('capitalInicial').value);
+    const tasa = parseFloat(document.getElementById('tasa').value);
+    const tiempo = parseFloat(document.getElementById('tiempo').value);
+    const tipoCapitalizacion = document.getElementById('tipoCapitalizacion').value;
+
+    // Validar campos
+    if (isNaN(capitalInicial) || isNaN(tasa) || isNaN(tiempo)) {
+        alert('Por favor, completa todos los campos correctamente.');
+        return;
+    }
+
+    if (capitalInicial <= 0 || tasa <= 0 || tiempo <= 0) {
+        alert('Todos los valores deben ser mayores a cero.');
+        return;
+    }
+
+    // Preparar datos para el endpoint
+    const data = {
+        c: capitalInicial,
+        i: tasa,
+        n: tiempo
+    };
+
+    try {
+        // Seleccionar endpoint según tipo
+        const endpoint = tipoCapitalizacion === 'simple' 
+            ? 'http://127.0.0.1:5000/calcular_Capitalizacion_simple' 
+            : 'http://127.0.0.1:5000/calcular_Capitalizacion_compuesta';
+
+        // Realizar petición
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error en el cálculo');
         }
 
-        if (capitalInicial <= 0 || tasa <= 0 || tiempo <= 0) {
-            alert('Todos los valores deben ser mayores a cero');
-            return;
-        }
+        const result = await response.json();
+        const valorFuturo = result.Vf;
+        const intereses = valorFuturo - capitalInicial;
 
-        // Validar frecuencia si es necesario
-        if (tipoCapitalizacion === 'frecuencia') {
-            const frecuencia = document.getElementById('frecuencia').value;
-            if (!frecuencia) {
-                alert('Por favor, selecciona una frecuencia de capitalización');
-                return;
-            }
-        }
-
-        // Mostrar mensaje temporal
-        resultValue.textContent = "—";
-        resultDetail.textContent = "El cálculo de capitalización estará disponible próximamente.";
-        resultBox.classList.remove('hidden');
-        resultBreakdown.classList.add('hidden');
+        // Mostrar resultados
+        document.getElementById('resultBox').classList.remove('hidden');
+        document.getElementById('resultValue').textContent = `$${valorFuturo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         
-        // Ocultar comparativa por ahora
-        comparativaSection.classList.add('hidden');
-    });
+        const tipoTexto = tipoCapitalizacion === 'simple' ? 'Simple' : 'Compuesta';
+        document.getElementById('resultDetail').textContent = 
+            `Capitalización ${tipoTexto} - ${tiempo} año(s) al ${tasa}% anual`;
+
+        // Mostrar desglose
+        document.getElementById('resultBreakdown').classList.remove('hidden');
+        document.getElementById('capitalInicialDisplay').textContent = 
+            `$${capitalInicial.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('interesesDisplay').textContent = 
+            `$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('valorFinalDisplay').textContent = 
+            `$${valorFuturo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+    } catch (error) {
+        alert('Error al calcular: ' + error.message);
+        console.error('Error:', error);
+    }
+});
 </script>
+
+
 {% endblock %}

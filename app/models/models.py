@@ -210,10 +210,10 @@ class Capitalizacion(BaseModel):
     Vf:opcional[float]=None
 #es practicamente com lo del semetre pasado
     def capitalizacion_compuesta(self):
-        self.vf=self.c*math.pow((1+(self.i/100)),self.n)
+        self.Vf=self.c*math.pow((1+(self.i/100)),self.n)
         return round(self.Vf,2)
     def capitalizacion_simple(self):
-        self.vf=self.c*(1+(self.i/100)*self.n)
+        self.Vf=self.c*(1+(self.i/100)*self.n)
         return round(self.Vf,2)
 
 class Tasa_Interna_De_Retorno(BaseModel):
