@@ -208,7 +208,7 @@ class Capitalizacion(BaseModel):
     i:float
     n:float
     Vf:opcional[float]=None
-
+#es practicamente com lo del semetre pasado
     def capitalizacion_compuesta(self):
         self.vf=self.c*math.pow((1+(self.i/100)),self.n)
         return round(self.Vf,2)
