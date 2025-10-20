@@ -21,3 +21,11 @@ def calcular_Gradiente_geometrico(data:Gradiente):
         return {"Valor Futuro Gradiente Geometrico":vf,"Valor Actual Gradiente Geometrico":va}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/calcular_series_gradiente")
+def calcular_series_gradiente(data:Gradiente):
+    try:    
+        series=data.series()
+        return {"Series Gradiente":series}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

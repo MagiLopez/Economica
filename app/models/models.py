@@ -172,6 +172,8 @@ class Amortizacion(BaseModel):
        
 
 class Gradiente (BaseModel):
+    ct:list
+    t:float
     A:float
     g:float #para el gradiente aritmetico es una cantidad fija
     G:float #para el gradiente geometrico es %
@@ -203,12 +205,19 @@ class Gradiente (BaseModel):
             self.vf=self.A*(((math.pow((1+(self.G/100)),self.n)- math.pow((1+(self.i/100)),self.n))/((self.i/100)-(self.g/100))))
             return round(self.vf,2)
 
+    def series(self):
+        self.va=[ct/math.pow((1+(self.i/100)),t) for t,ct in enumerate(self.ct, start=1)]
+        
+        self.vf=[ct*math.pow((1+(self.i/100)),self.n-t) for t,ct in enumerate(self.ct, start=1)]
+
+        return {round(sum(self.va),2), round(sum(self.vf),2)}
+
 class Capitalizacion(BaseModel):
     c:float
     i:float
     n:float
     Vf:opcional[float]=None
-#es practicamente com lo del semetre pasado
+#es practicamente como lo del semetre pasado
     def capitalizacion_compuesta(self):
         self.vf=self.c*math.pow((1+(self.i/100)),self.n)
         return round(self.Vf,2)
