@@ -17,13 +17,13 @@
         </button>
         <div class="teoria-content" id="teoriaContent">
             <h3>💡 Conceptos Básicos</h3>
-            <p>Un <strong>gradiente aritmético</strong> es una serie de pagos o ingresos que cambian en una cantidad constante cada período.  
-               Es útil para analizar situaciones donde los flujos de efectivo crecen o disminuyen regularmente.</p>
+            <p>Un <strong>Gradiente </strong> es una sucesión de pagos o ingresos que varían de un período a otro según una regla establecida. Se utiliza en el análisis financiero para representar flujos de efectivo no uniformes, es decir, que cambian a lo largo del tiempo.</p>
 
             <h4>Tipos de Gradientes:</h4>
             <div class="tipo-box">
                 <strong>🔹 Gradiente Aritmético:</strong> Los pagos aumentan o disminuyen en una cantidad constante (G).<br>
-                <strong>🔹 Gradiente Geométrico:</strong> Los pagos cambian en un porcentaje constante por período.
+                <strong>🔹 Gradiente Geométrico:</strong> Los pagos cambian en un porcentaje constante por período.<br>
+                <strong>🔹 Series Variables:</strong> Pagos no uniformes sin patrón definido.
             </div>
 
             <h4>Fórmulas Principales:</h4>
@@ -47,43 +47,66 @@
         </div>
     </div>
 
-    <p>Completa exactamente <strong>4 campos</strong> y deja <strong>1 vacío</strong>. El cálculo se realizará cuando esté disponible la conexión.</p>
-
-    <form id="gradientesForm">
-        <div class="input-row">
-            <div class="input-group">
-                <label for="A">Primer pago (A):</label>
-                <input type="number" id="A" name="A">
-            </div>
-
-            <div class="input-group">
-                <label for="G">Gradiente (G):</label>
-                <input type="number" id="G" name="G">
-            </div>
-        </div>
-
-        <div class="input-row">
-            <div class="input-group">
-                <label for="n">Número de períodos (n):</label>
-                <input type="number" id="n" name="n">
-            </div>
-
-            <div class="input-group">
-                <label for="tasa">Tasa de interés (i):</label>
-                <input type="number" id="tasa" name="tasa" step="0.01">
-            </div>
-        </div>
-
+    
+    <form id="gradientesForm" class="form">
         <div class="input-group full-width">
             <label for="calcular">¿Qué deseas calcular?</label>
             <select id="calcular" name="calcular">
-                <option value="vf">Gradiente Aritmético </option>
-                <option value="vp">Gradiente Geométrico </option>
+                <option value="aritmetico">Gradiente Aritmético</option>
+                <option value="geometrico">Gradiente Geométrico</option>
+                <option value="series">Series Variables</option>
             </select>
         </div>
 
+        <!-- Campos para Gradientes Aritmético y Geométrico -->
+        <div id="camposGradientes">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="A">Primer pago (A):</label>
+                    <input type="number" id="A" name="A" step="any">
+                </div>
+
+                <div class="input-group">
+                    <label for="G">Gradiente (G):</label>
+                    <input type="number" id="G" name="G" step="any">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="n">Número de períodos (n):</label>
+                    <input type="number" id="n" name="n">
+                </div>
+
+                <div class="input-group">
+                    <label for="tasa">Tasa de interés (i):</label>
+                    <input type="number" id="tasa" name="tasa" step="0.01">
+                </div>
+            </div>
+        </div>
+
+        <!-- Campos para Series Variables -->
+        <div id="camposSeries" class="hidden">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="nSeries">Número de períodos:</label>
+                    <input type="number" id="nSeries" name="nSeries" min="1" >
+                </div>
+            
+                <div class="input-group">
+                    <label for="tasaSeries">Tasa de interés (i):</label>
+                    <input type="number" id="tasaSeries" name="tasaSeries" step="0.01">
+                </div>
+            </div>
+
+            <button type="button" class="btn" id="generarFlujosBtn" style="margin-top: 20px;">
+                📋 Generar campos de flujos </button>
+
+            <div id="flujosContainer"></div>
+        </div>
+
         <button type="button" class="btn" id="calcularBtn">Calcular</button>
-    </form>
+</form>
 
     <div class="result-box hidden" id="resultBox">
         <div class="result-content">
@@ -94,36 +117,186 @@
     </div>
 </div>
 
-<script>
-document.getElementById('calcularBtn').addEventListener('click', async function() {
-    const A = parseFloat(document.getElementById('A').value) || 0;
-    const G = parseFloat(document.getElementById('G').value) || 0;
-    const n = parseFloat(document.getElementById('n').value) || 0;
-    const i = parseFloat(document.getElementById('tasa').value) || 0;
-    const tipo = document.getElementById('calcular').value;
 
+    <div class="result-box hidden" id="resultBox">
+        <div class="result-content">
+            <h3>💰 Resultado:</h3>
+            <div class="result-value" id="resultValue">—</div>
+            <div class="result-detail" id="resultDetail">El resultado aparecerá aquí.</div>
+        </div>
+    </div>
+</div>
+<style>
+    /* Estilos específicos para flujos de caja */
+    #flujosContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .flujo-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+        transition: all 0.3s ease;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .flujo-item:hover {
+        background: rgba(102, 126, 234, 0.1);
+        transform: translateX(3px);
+    }
+    
+    .flujo-item label {
+        font-weight: 600;
+        color: #667eea;
+        min-width: 90px;
+        margin: 0;
+    }
+    
+    .flujo-item input {
+        flex: 1;
+        padding: 10px;
+        border: 2px solid #e1e8ed;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .flujo-item input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .flujo-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .flujo-item label {
+            min-width: auto;
+        }
+        
+        .flujo-item input {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    // Función para toggle de teoría
+    document.getElementById('teoriaBtn').addEventListener('click', function() {
+        const content = document.getElementById('teoriaContent');
+        const icon = document.getElementById('teoriaIcon');
+        
+        content.classList.toggle('show');
+        icon.classList.toggle('rotated');
+    });
+     // Cambiar campos según tipo de cálculo
+    document.getElementById('calcular').addEventListener('change', function() {
+        const tipo = this.value;
+        const camposGradientes = document.getElementById('camposGradientes');
+        const camposSeries = document.getElementById('camposSeries');
+        const flujosContainer = document.getElementById('flujosContainer');
+
+        if (tipo === 'series') {
+            // Mostrar solo campos de series variables
+            camposGradientes.classList.add('hidden');
+            camposSeries.classList.remove('hidden');
+            // Limpiar flujos anteriores
+            flujosContainer.innerHTML = '';
+        } else {
+            // Mostrar campos de gradientes aritmético/geométrico
+            camposGradientes.classList.remove('hidden');
+            camposSeries.classList.add('hidden');
+            // Limpiar flujos anteriores
+            flujosContainer.innerHTML = '';
+        }
+    });
+
+
+    // Generar campos de flujos para series variables
+    document.getElementById('generarFlujosBtn').addEventListener('click', function() {
+        const n = parseInt(document.getElementById('nSeries').value) || 0;
+        const container = document.getElementById('flujosContainer');
+        container.innerHTML = '';
+
+        if (n <= 0) {
+            alert('Por favor ingresa un número de períodos válido (mayor a 0)');
+            return;
+        }
+
+        if (n > 50) {
+            alert('Por favor ingresa un número de períodos menor o igual a 50');
+            return;
+        }
+
+        // Generar los campos dinámicamente
+        for (let i = 1; i <= n; i++) {
+            const flujoDiv = document.createElement('div');
+            flujoDiv.className = 'flujo-item';
+            flujoDiv.innerHTML = `
+                <label>Período ${i}:</label>
+                <input type="number" class="flujo-input" data-periodo="${i}" step="any" placeholder="Ingresa el flujo del período ${i}" required>
+            `;
+            container.appendChild(flujoDiv);
+        }
+    });
+
+
+    // calcular....
+document.getElementById('calcularBtn').addEventListener('click', async function() {
+    const tipo = document.getElementById('calcular').value;
     const resultBox = document.getElementById('resultBox');
     const resultValue = document.getElementById('resultValue');
     const resultDetail = document.getElementById('resultDetail');
 
-    // Determinar endpoint y payload según el tipo
     let endpoint = "";
-    let payload = {
-        A: A,
-        i: i,
-        n: n,
-        g: 0,
-        G: 0
-    };
+    let payload = {};
 
-    if (tipo === 'vf') {
-        // Gradiente Aritmético
-        endpoint = "http://127.0.0.1:5000/calcular_Gradiente_aritmetico";
-        payload.g = G;
-    } else {
-        // Gradiente Geométrico
-        endpoint = "http://127.0.0.1:5000/calcular_Gradiente_geometrico";
-        payload.G = G;
+    // Gradiente aritmético o geométrico
+    if (tipo === 'aritmetico' || tipo === 'geometrico') {
+        const A = parseFloat(document.getElementById('A').value) || 0;
+        const G = parseFloat(document.getElementById('G').value) || 0;
+        const n = parseFloat(document.getElementById('n').value) || 0;
+        const i = parseFloat(document.getElementById('tasa').value) || 0;
+
+        payload = { A: A, G: G, g: G, i: i, n: n, ct: [], t: 0 };
+
+        if (tipo === 'aritmetico') {
+            endpoint = "http://127.0.0.1:5000/calcular_Gradiente_aritmetico";
+        } else {
+            endpoint = "http://127.0.0.1:5000/calcular_Gradiente_geometrico";
+        }
+    }
+
+    // Series variables
+    else if (tipo === 'series') {
+        const tasa = parseFloat(document.getElementById('tasaSeries').value) || 0;
+        const n = parseInt(document.getElementById('nSeries').value) || 0;
+
+        const flujos = Array.from(document.querySelectorAll('.flujo-input')).map(input => parseFloat(input.value) || 0);
+
+        payload = { ct: flujos, i: tasa, n: n, t: 0, A: 0, g: 0, G: 0 };
+        endpoint = "http://127.0.0.1:5000/calcular_series_gradiente";
     }
 
     try {
@@ -139,24 +312,37 @@ document.getElementById('calcularBtn').addEventListener('click', async function(
         }
 
         const data = await response.json();
-
-        // Mostrar resultados
         resultBox.classList.remove('hidden');
-        
-        if (tipo === 'vf') {
+
+        if (tipo === 'aritmetico') {
             resultValue.textContent = `Valor Futuro: ${data["Valor Futuro Gradiente Aritmetico"]}`;
             resultDetail.textContent = `Valor Actual: ${data["Valor Actual Gradiente Aritmetico"]}`;
-        } else {
+        } 
+        else if (tipo === 'geometrico') {
             resultValue.textContent = `Valor Futuro: ${data["Valor Futuro Gradiente Geometrico"]}`;
             resultDetail.textContent = `Valor Actual: ${data["Valor Actual Gradiente Geometrico"]}`;
         }
-        
+        else if (tipo === 'series') {
+           // El backend devuelve un set {VA, VF} en ese orden fijo
+            const valores = Array.from(data["Series Gradiente"]);
+            const va = valores[0];
+            const vf = valores[1];
+
+            resultValue.textContent = "Series Variables";
+            resultDetail.innerHTML = `
+                <strong>Valor Presente (VP):</strong> ${va}<br>
+                <strong>Valor Futuro (VF):</strong> ${vf}
+            `;
+
+        }
+
     } catch (error) {
         resultBox.classList.remove('hidden');
         resultValue.textContent = "⚠️ Error";
         resultDetail.textContent = error.message;
     }
 });
+
 </script>
 
 {% endblock %}
