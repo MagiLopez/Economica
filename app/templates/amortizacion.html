@@ -158,23 +158,115 @@
 </div>
 
 <style>
-    #tablaAmortizacion th, 
+   /* === ESTILOS BASE DE LA TABLA === */
+#tablaAmortizacion {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#tablaAmortizacion th, 
+#tablaAmortizacion td {
+    text-align: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#tablaAmortizacion th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+#tablaTotal {
+    font-weight: bold;
+    background: #e8eefc;
+}
+
+#tablaTotal td {
+    border-top: 2px solid #667eea;
+    border-bottom: none;
+    font-size: 1.05rem;
+}
+
+/* === CONTENEDOR CON SCROLL HORIZONTAL === */
+.tabla-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilo de la barra de scroll */
+.tabla-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tabla-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.tabla-container::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+.tabla-container::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+/* === RESPONSIVE PARA MÓVILES === */
+@media (max-width: 768px) {
+    #tablaAmortizacion th,
     #tablaAmortizacion td {
-        text-align: center;
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
+        padding: 10px 8px;
+        font-size: 0.85rem;
+        white-space: nowrap; /* Evita que el texto se parta */
     }
 
-
-    #tablaTotal {
-        font-weight: bold;
-        background: #e8eefc;
+    #tablaAmortizacion th {
+        font-size: 0.8rem;
     }
 
     #tablaTotal td {
-        border-top: 2px solid #667eea;
-        border-bottom: none; /* Sin línea inferior en totales */
+        font-size: 0.95rem;
     }
+}
+
+@media (max-width: 480px) {
+    #tablaAmortizacion th,
+    #tablaAmortizacion td {
+        padding: 8px 6px;
+        font-size: 0.75rem;
+    }
+
+    #tablaAmortizacion th {
+        font-size: 0.7rem;
+    }
+}
+
+/* === INDICADOR DE SCROLL (OPCIONAL) === */
+.scroll-indicator {
+    text-align: center;
+    color: #667eea;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    font-style: italic;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .scroll-indicator {
+        display: block;
+    }
+}
 </style>
 
 <script>

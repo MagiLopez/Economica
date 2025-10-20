@@ -11,6 +11,7 @@
   display: flex;
   flex-direction: column;
   transition: left 0.3s ease;
+  overflow-y: auto; /* Para scroll si hay muchos elementos */
 }
 
 /* Contenido con sidebar fijo en desktop */
@@ -54,6 +55,22 @@
   display: none; /* Oculto en desktop */
 }
 
+/* === ENCABEZADOS DE SECCIÓN (PRIMER/SEGUNDO CORTE) === */
+.section-header {
+  padding: 15px 20px 8px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5A9BD5;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 10px;
+  border-bottom: 1px solid rgba(90, 155, 213, 0.3);
+}
+
+.section-header:first-of-type {
+  margin-top: 0;
+}
+
 /* === MENÚ === */
 .sidebar-menu {
   list-style: none;
@@ -72,6 +89,7 @@
   color: #fff;
   text-decoration: none;
   font-size: 15px;
+  transition: background 0.2s ease;
 }
 
 .sidebar-menu li a:hover {
@@ -116,5 +134,3 @@
     margin-left: 0; /* No desplazar contenido en móviles */
   }
 }
-
-
