@@ -204,7 +204,7 @@ class Gradiente (BaseModel):
         else:
             self.vf=self.A*(((math.pow((1+(self.G/100)),self.n)- math.pow((1+(self.i/100)),self.n))/((self.i/100)-(self.g/100))))
             return round(self.vf,2)
-
+#series
     def series(self):
         self.va=[ct/math.pow((1+(self.i/100)),t) for t,ct in enumerate(self.ct, start=1)]
         
